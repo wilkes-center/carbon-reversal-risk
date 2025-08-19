@@ -1,7 +1,7 @@
 {
     "name": "carbon-webapp",
     "version": "3.0.0",
-    "homepage": "https://praveenaak.github.io/carbon-webapp/",
+    "homepage": "https://wilkes-center.github.io/carbon-reversal-risk/",
     "private": true,
     "dependencies": {
         "@anthropic-ai/claude-code": "^1.0.83",
