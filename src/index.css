@@ -1,0 +1,212 @@
+/* Google Fonts import */
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700&family=Sora:wght@400;600&display=swap');
+
+/* Tailwind base styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  body {
+    @apply m-0 antialiased bg-white text-obsidian;
+    font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', sans-serif;
+  }
+
+  h1 {
+    @apply text-display font-semibold;
+  }
+
+  h2 {
+    @apply text-section-header font-semibold;
+  }
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+     monospace;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  /* You can add your custom component styles here */
+  .layer-control {
+    @apply flex flex-col h-full bg-white shadow-sm;
+  }
+
+  .layer-group {
+    @apply mb-4 bg-gray-50 rounded-lg overflow-hidden;
+  }
+
+  .layer-button {
+    @apply px-3 py-2 text-sm rounded-md transition-all;
+  }
+
+  .layer-button.active {
+    @apply bg-blue text-white shadow-sm;
+  }
+
+  .layer-button:not(.active) {
+    @apply bg-white text-obsidian hover:bg-gray-100 border border-gray-200;
+  }
+
+  .draw-button {
+    @apply w-full px-4 py-2 rounded-md transition-colors flex items-center justify-center gap-2;
+  }
+
+  .draw-button.active {
+    @apply bg-rust hover:bg-rust/90 text-white;
+  }
+
+  .draw-button:not(.active) {
+    @apply bg-green hover:bg-green/90 text-white;
+  }
+
+  .section-title {
+    @apply text-sm font-medium text-obsidian mb-3 font-sora;
+  }
+
+  .tooltip {
+    @apply absolute z-50 bg-white p-2 rounded-md shadow-lg text-sm;
+  }
+}
+
+/* Custom utility styles */
+@layer utilities {
+  /* You can add your custom utility classes here */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Dark theme popup styles with green background */
+.dark-popup .mapboxgl-popup-content {
+  background-color: #2d5354; /* Great Salt Lake Green */
+  color: #f9f6ef; /* Snowbird White */
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-popup .mapboxgl-popup-tip {
+  border-top-color: #2d5354; /* Great Salt Lake Green */
+  border-bottom-color: #2d5354; /* Great Salt Lake Green */
+}
+
+.dark-popup .mapboxgl-popup-close-button {
+  color: #f9f6ef; /* Snowbird White */
+  font-size: 18px !important;
+  font-weight: bold !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.dark-popup .mapboxgl-popup-close-button:hover {
+  color: #f9f6ef; /* Snowbird White */
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Light theme popup styles with green background */
+.mapboxgl-popup-content {
+  background-color: #2d5354; /* Great Salt Lake Green */
+  color: #f9f6ef; /* Snowbird White */
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: #2d5354; /* Great Salt Lake Green */
+  border-bottom-color: #2d5354; /* Great Salt Lake Green */
+}
+
+.mapboxgl-popup-close-button {
+  color: #f9f6ef; /* Snowbird White */
+  font-size: 18px !important;
+  font-weight: bold !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.mapboxgl-popup-close-button:hover {
+  color: #f9f6ef; /* Snowbird White */
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Light theme scrollbar */
+.light-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.light-scrollbar::-webkit-scrollbar-track {
+  background: #f9f6ef; /* Snowbird White */
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb {
+  background: #cea25d; /* Canyonlands Tan */
+  border-radius: 3px;
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b18a45; /* Darker Canyonlands Tan */
+}
+
+/* Dark theme scrollbar */
+.dark-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: #1a1a1a; /* Olympic Park Obsidian */
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #4B5563;
+  border-radius: 3px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+/* Firefox scrollbar styles */
+.light-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cea25d #f9f6ef; /* Tan on White */
+}
+
+.dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 #1a1a1a; /* Gray on Obsidian */
+}
+
+

@@ -1,0 +1,56 @@
+/* Set the green color to use in both light and dark modes */
+:root {
+    --border-green: #2d5354; /* Great Salt Lake Green color for all modes */
+  }
+  
+  /* Dark mode class selectors - using Great Salt Lake Green */
+  .bg-gray-800, .bg-gray-900 {
+    --border-green: #2d5354;
+  }
+  
+  /* Light mode class selectors */
+  .bg-white, .bg-gray-50, .bg-gray-100 {
+    /* In light mode elements, use Great Salt Lake Green */
+    --border-green: #2d5354;
+  }
+  
+  /* Default if no mode is detected */
+  :root {
+    --border-green: #2d5354;
+  }
+  
+  /* Main section dividers */
+  .border-t, .border-b {
+    border-color: var(--border-green) !important;
+  }
+  
+  /* Section headers with bottom borders */
+  [class*="border-b"] {
+    border-color: var(--border-green) !important;
+  }
+  
+  /* Other horizontal dividers */
+  .divide-y > * {
+    border-color: var(--border-green) !important;
+  }
+  
+  /* Button groups and other UI elements with borders */
+  .border {
+    border-color: var(--border-green) !important;
+  }
+  
+  /* Layer group borders */
+  .layer-group, .section {
+    border-color: var(--border-green) !important;
+  }
+  
+  /* For panels in both light and dark mode */
+  .bg-gray-50 .border-gray-200,
+  .bg-gray-900 .border-gray-700 {
+    border-color: var(--border-green) !important;
+  }
+  
+  /* Specific adjustments for SlidingPanel edge */
+  .SlidingPanel .absolute.right-0 {
+    background-color: var(--border-green) !important;
+  }
