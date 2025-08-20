@@ -6,7 +6,6 @@ This directory contains UI control components that manage user interactions with
 
 - **FileUploadControl.js**: Handles file uploads for custom map layers
 - **MapControls.js**: Primary map controls including zoom, rotation, and theme toggling
-- **MapFileControls.js**: Controls for map-related file operations (download/upload)
 - **MapViewToggle.js**: Toggles between US and global map views
 - **SearchBar.js**: Location search functionality
 

@@ -11,7 +11,6 @@ This directory contains general UI components used throughout the application.
 - **InfoTooltip.js**: Information tooltip component
 - **MapDescription.js**: Descriptive text for map layers
 - **UploadNotification.js**: Notification system for file uploads
-- **VisitorCounter.js**: Displays visitor count
 
 ## Usage
 

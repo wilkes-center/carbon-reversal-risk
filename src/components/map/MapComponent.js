@@ -12,9 +12,6 @@ import LayerControl from '../panels/LayerControl';
 import { useViewport } from '../../hooks/map/mapHooks';
 import MiniMap from './MiniMap';
 import { downloadLayerDataAsCSV, getCurrentMapBounds } from '../../utils/map/downloadUtils';
-import MapFileControls from '../controls/MapFileControls';
-import toGeoJSON from '@mapbox/togeojson';
-import * as shp from 'shpjs';
 import useUploadedLayerStyling from '../../hooks/layers/useUploadedLayerStyling';
 import MapControls from '../controls/MapControls';
 import DarkPopup from '../ui/DarkPopup';
@@ -24,7 +21,6 @@ import DrawControl from './DrawControl';
 import SlidingPanel from '../panels/SlidingPanel';
 import { useMapPaint } from '../../contexts/MapPaintContext';
 import legendStateManager from '../../utils/colors/LegendStateManager';
-import VisitorCounter from '../ui/VisitorCounter';
 import CongressionalDistrictsLayer from '../layers/CongressionalDistrictsLayer';
 import CongressionalDistrictPopup from '../ui/CongressionalDistrictPopup';
 import CollapsibleLegend from '../legend/CollapsibleLegend';
@@ -213,13 +209,6 @@ const MapComponent = () => {
 
 
 
-  const handleDownloadClick = () => {
-    if (activeLayer) {
-      handleDownloadData(activeLayer);
-    } else {
-      alert('Please select a layer to download');
-    }
-  };
 
   const toggleDarkMode = useCallback(() => {
     // Clear all layers first
@@ -1033,82 +1022,6 @@ const getBoundsFromFeatures = (features) => {
 
   const mapStyle = useMemo(() => basemaps.find(b => b.id === activeBasemap).style, [activeBasemap]);
 
-  const handleFileUploadFromControl = useCallback((file) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const content = e.target.result;
-        let parsedData;
-  
-        if (file.name.endsWith('.zip')) {
-          console.log('Processing zip file...');
-          const zipBuffer = e.target.result;
-          try {
-            parsedData = await shp(zipBuffer);
-            console.log('Parsed shapefile:', JSON.stringify(parsedData, null, 2));
-          } catch (shpError) {
-            console.error('Error parsing shapefile:', shpError);
-            throw new Error(`Failed to parse shapefile: ${shpError.message}`);
-          }
-        } else if (file.name.endsWith('.kml')) {
-          const kml = new DOMParser().parseFromString(content, 'text/xml');
-          parsedData = toGeoJSON.kml(kml);
-        } else if (file.name.endsWith('.json') || file.name.endsWith('.geojson')) {
-          parsedData = JSON.parse(content);
-        } else {
-          throw new Error('Unsupported file format');
-        }
-  
-        // Convert parsed data to FeatureCollection
-        let geoJSON;
-        if (Array.isArray(parsedData)) {
-          geoJSON = {
-            type: 'FeatureCollection',
-            features: parsedData.map(geometry => ({
-              type: 'Feature',
-              geometry: geometry,
-              properties: {}
-            }))
-          };
-        } else if (parsedData.type === 'Feature') {
-          geoJSON = {
-            type: 'FeatureCollection',
-            features: [parsedData]
-          };
-        } else if (parsedData.type === 'FeatureCollection') {
-          geoJSON = parsedData;
-        } else {
-          throw new Error('Invalid GeoJSON structure');
-        }
-  
-        console.log('Processed GeoJSON:', JSON.stringify(geoJSON, null, 2));
-        console.log('GeoJSON type:', geoJSON.type);
-        console.log('Features array:', Array.isArray(geoJSON.features));
-        if (geoJSON.features) {
-          console.log('Number of features:', geoJSON.features.length);
-          if (geoJSON.features.length > 0) {
-            console.log('First feature type:', geoJSON.features[0].type);
-            console.log('First feature geometry type:', geoJSON.features[0].geometry.type);
-          }
-        }
-  
-        if (isValidGeoJSON(geoJSON)) {
-          handleFileUpload(geoJSON, file.name);
-        } else {
-          throw new Error('Invalid GeoJSON structure after processing');
-        }
-      } catch (error) {
-        console.error('Error processing file:', error);
-        setUploadError(error.message);
-      }
-    };
-  
-    if (file.name.endsWith('.zip')) {
-      reader.readAsArrayBuffer(file);
-    } else {
-      reader.readAsText(file);
-    }
-  }, [handleFileUpload]);
 
   // Final cleanup effect for when the component unmounts completely
   useEffect(() => {
@@ -1400,13 +1313,6 @@ const getBoundsFromFeatures = (features) => {
         />
       )}
 
-      {/* Bottom controls for file operations. Secondary buttons apart from the Upload/Download section from the left side panel. Modufy the download button to include download by area or download by section */}
-      <MapFileControls 
-        onFileUpload={handleFileUploadFromControl}
-        onDownloadClick={handleDownloadClick}
-        setUploadStatus={setUploadStatus}
-        isDarkMode={isDarkMode}
-      />
 
       {uploadedLayers.length > 0 && activeLayer && (
         <AreaStats
@@ -1455,7 +1361,6 @@ const getBoundsFromFeatures = (features) => {
         </div>
       </div>
 
-      <VisitorCounter isDarkMode={isDarkMode} />
     </div>
     );
     };
