@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/carbon-webapp/static/css/main.bfeaa256.css",
-    "main.js": "/carbon-webapp/static/js/main.b20539a3.js",
-    "static/js/453.23f8602b.chunk.js": "/carbon-webapp/static/js/453.23f8602b.chunk.js",
-    "index.html": "/carbon-webapp/index.html",
-    "main.bfeaa256.css.map": "/carbon-webapp/static/css/main.bfeaa256.css.map",
-    "main.b20539a3.js.map": "/carbon-webapp/static/js/main.b20539a3.js.map",
-    "453.23f8602b.chunk.js.map": "/carbon-webapp/static/js/453.23f8602b.chunk.js.map"
+    "main.css": "/carbon-reversal-risk/static/css/main.bfeaa256.css",
+    "main.js": "/carbon-reversal-risk/static/js/main.864f59eb.js",
+    "static/js/453.23f8602b.chunk.js": "/carbon-reversal-risk/static/js/453.23f8602b.chunk.js",
+    "index.html": "/carbon-reversal-risk/index.html",
+    "main.bfeaa256.css.map": "/carbon-reversal-risk/static/css/main.bfeaa256.css.map",
+    "main.864f59eb.js.map": "/carbon-reversal-risk/static/js/main.864f59eb.js.map",
+    "453.23f8602b.chunk.js.map": "/carbon-reversal-risk/static/js/453.23f8602b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.bfeaa256.css",
-    "static/js/main.b20539a3.js"
+    "static/js/main.864f59eb.js"
   ]
 }

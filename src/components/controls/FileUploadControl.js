@@ -2,7 +2,8 @@ import React, { useRef, useState, useCallback } from 'react';
 import toGeoJSON from '@mapbox/togeojson';
 import { Upload, Loader } from 'lucide-react';
 import JSZip from 'jszip';
-import { handleShapefile } from '../../utils/map/shapefileHandler';;
+import { handleShapefile } from '../../utils/map/shapefileHandler';
+import { processGeoJSON } from '../../utils/map/coordinateReprojection';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const ACCEPTED_FORMATS = {
@@ -53,8 +54,16 @@ const FileUploadControl = ({ onFileUpload, setUploadStatus }) => {
         return null;
       }
       
+      setUploadStatus('Processing coordinates and reprojecting if needed...');
+      const processedGeoJSON = processGeoJSON(geoJSON);
+      
+      if (!processedGeoJSON) {
+        setUploadStatus('Failed to process GeoJSON coordinates');
+        return null;
+      }
+      
       setUploadStatus('Validating GeoJSON features...');
-      return geoJSON;
+      return processedGeoJSON;
     } catch (error) {
       setUploadStatus(`Invalid GeoJSON file: ${error.message}`);
       return null;
@@ -83,8 +92,16 @@ const FileUploadControl = ({ onFileUpload, setUploadStatus }) => {
         return null;
       }
       
+      setUploadStatus('Processing coordinates and reprojecting if needed...');
+      const processedGeoJSON = processGeoJSON(geoJSON);
+      
+      if (!processedGeoJSON) {
+        setUploadStatus('Failed to process KML coordinates');
+        return null;
+      }
+      
       setUploadStatus('Validating converted features...');
-      return geoJSON;
+      return processedGeoJSON;
     } catch (error) {
       setUploadStatus(`KML processing failed: ${error.message}`);
       return null;
@@ -127,8 +144,16 @@ const FileUploadControl = ({ onFileUpload, setUploadStatus }) => {
         return null;
       }
       
+      setUploadStatus('Processing coordinates and reprojecting if needed...');
+      const processedGeoJSON = processGeoJSON(geoJSON);
+      
+      if (!processedGeoJSON) {
+        setUploadStatus('Failed to process KMZ coordinates');
+        return null;
+      }
+      
       setUploadStatus('Validating converted features...');
-      return geoJSON;
+      return processedGeoJSON;
     } catch (error) {
       setUploadStatus(`KMZ processing failed: ${error.message}`);
       return null;
