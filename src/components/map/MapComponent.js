@@ -492,8 +492,8 @@ const handleMapClick = useCallback((event) => {
       value = feature.properties.raster_value;
     }
 
-    // Include 0 values for buffer pool layers
-    return layerId.includes('BufferPool') 
+    // Include 0 values for buffer pool layers and reversal risk layers
+    return (layerId.includes('BufferPool') || layerId.includes('RiskSSP'))
       ? value >= 0 
       : value > 0;
   });
@@ -667,7 +667,13 @@ const handleMapClick = useCallback((event) => {
               },
               filter: layerId.includes('BufferPool') 
           ? ['>=', ['get', 'raster_value'], 0]  // Include 0 for buffer pools
-          : ['>', ['get', 'raster_value'], 0]   // Exclude 0 for risk layers
+          : layerId.includes('DroughtRisk')
+          ? ['>=', ['get', 'drought_risk'], 0]  // Include 0 for drought risk
+          : layerId.includes('InsectRisk')
+          ? ['>=', ['get', 'insect_risk'], 0]   // Include 0 for insect risk
+          : layerId.includes('FireRisk')
+          ? ['>=', ['get', 'fire_risk'], 0]     // Include 0 for fire risk
+          : ['>', ['get', 'raster_value'], 0]   // Exclude 0 for other layers
         });
             
   

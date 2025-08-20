@@ -89,7 +89,13 @@ const AreaStats = ({
   
             if (turf.booleanPointInPolygon(centerPoint, safePolygon)) {
               const value = feature.properties[valueKey];
-              if (typeof value === 'number' && !isNaN(value)) {
+              const isReversalRiskLayer = activeLayer && activeLayer.includes('RiskSSP');
+              
+              // Include 0 values for reversal risk layers, exclude for others
+              const shouldInclude = typeof value === 'number' && !isNaN(value) && 
+                (isReversalRiskLayer ? value >= 0 : value > 0);
+              
+              if (shouldInclude) {
                 allFeatures.push({
                   value,
                   coordKey,

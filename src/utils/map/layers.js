@@ -109,7 +109,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-drought-ssp585',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'drought_risk'], 0]
+      filter: ['>=', ['get', 'drought_risk'], 0]
     }
   },
   {
@@ -125,7 +125,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-insect-ssp585',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'insect_risk'], 0]
+      filter: ['>=', ['get', 'insect_risk'], 0]
     }
   },
   {
@@ -141,7 +141,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-fire-ssp585',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'fire_risk'], 0]
+      filter: ['>=', ['get', 'fire_risk'], 0]
     }
   },
 
@@ -159,7 +159,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-drought-ssp245',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'drought_risk'], 0]
+      filter: ['>=', ['get', 'drought_risk'], 0]
     }
   },
   {
@@ -175,7 +175,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-insect-ssp245',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'insect_risk'], 0]
+      filter: ['>=', ['get', 'insect_risk'], 0]
     }
   },
   {
@@ -191,7 +191,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-fire-ssp245',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'fire_risk'], 0]
+      filter: ['>=', ['get', 'fire_risk'], 0]
     }
   },
 
@@ -209,7 +209,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-drought-ssp370',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'drought_risk'], 0]
+      filter: ['>=', ['get', 'drought_risk'], 0]
     }
   },
   {
@@ -225,7 +225,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-insect-ssp370',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'insect_risk'], 0]
+      filter: ['>=', ['get', 'insect_risk'], 0]
     }
   },
   {
@@ -241,7 +241,7 @@ const baseLayerConfigs = [
       'source-layer': 'us-rr-fire-ssp370',
       minzoom: 0,
       maxzoom: 22,
-      filter: ['>', ['get', 'fire_risk'], 0]
+      filter: ['>=', ['get', 'fire_risk'], 0]
     }
   },
 

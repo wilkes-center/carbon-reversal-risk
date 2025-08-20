@@ -160,7 +160,9 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
                 layout: {
                   visibility: 'visible'
                 },
-                filter: ['>', ['get', 'raster_value'], 0]
+                filter: baseLayerId.includes('BufferPool') || baseLayerId.includes('Gbf') || baseLayerId.includes('Gr')
+                  ? ['>=', ['get', 'raster_value'], 0]  // Include 0 for buffer pools and global layers
+                  : ['>', ['get', 'raster_value'], 0]   // Exclude 0 for other layers
               });
               
               if (map.getLayer(id)) {
