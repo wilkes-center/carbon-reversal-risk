@@ -1332,7 +1332,7 @@ const getBoundsFromFeatures = (features) => {
             activeLayer={activeLayer}
             uploadedFeatures={uploadedLayers[0]?.data?.features}
             isDarkMode={isDarkMode}
-            positionClass="left-96"
+            positionClass="left-[26rem]"
           />
         </>
       )}
@@ -1365,11 +1365,12 @@ const getBoundsFromFeatures = (features) => {
               geometry: selectedDistrictGeometry
             }]}
             isDarkMode={isDarkMode}
-            positionClass="right-96"
+            positionClass="right-[26rem]"
           />
         </>
       )}
 
+=
       </Map>
 
       {viewport.zoom > 5 && <MiniMap mainViewport={viewport} />}
