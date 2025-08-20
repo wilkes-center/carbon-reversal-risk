@@ -8,7 +8,8 @@ const AreaStats = ({
   isDarkMode, 
   map,
   isCongressionalDistrict = false, 
-  positionClass = "left-16"
+  positionClass = "left-16",
+  onFeaturesDataChange
 }) => {
   const [stats, setStats] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -91,7 +92,11 @@ const AreaStats = ({
               if (typeof value === 'number' && !isNaN(value)) {
                 allFeatures.push({
                   value,
-                  coordKey
+                  coordKey,
+                  longitude: centerLon,
+                  latitude: centerLat,
+                  properties: feature.properties,
+                  region: feature.properties.region
                 });
                 processedCoords.add(coordKey);
               }
@@ -116,9 +121,11 @@ const AreaStats = ({
           median: sortedValues[Math.floor(values.length / 2)].toFixed(2),
           count: values.length
         });
+        onFeaturesDataChange?.(allFeatures);
       } else {
         console.log('No features found in the selected area');
         setStats(null);
+        onFeaturesDataChange?.([]);
       }
     } catch (error) {
       console.error('Error calculating stats:', error);

@@ -26,6 +26,7 @@ import CongressionalDistrictPopup from '../ui/CongressionalDistrictPopup';
 import CollapsibleLegend from '../legend/CollapsibleLegend';
 import UploadNotification from '../ui/UploadNotification';
 import AreaStats from '../ui/AreaStats';
+import DownloadButton from '../ui/DownloadButton';
 import { useEnhancedMapLayer } from '../../hooks/layers/useEnhancedMapLayer';
 import GuidedTour from '../ui/GuidedTour';
 
@@ -68,6 +69,8 @@ const MapComponent = () => {
   const [districtPopupInfo, setDistrictPopupInfo] = useState(null);
   const [uploadStatus, setUploadStatus] = useState('');
   const [selectedDistrictGeometry, setSelectedDistrictGeometry] = useState(null);
+  const [uploadedAreaFeaturesData, setUploadedAreaFeaturesData] = useState([]);
+  const [districtFeaturesData, setDistrictFeaturesData] = useState([]);
 
   const updateTimeoutRef = useRef(null);
 
@@ -1315,33 +1318,58 @@ const getBoundsFromFeatures = (features) => {
 
 
       {uploadedLayers.length > 0 && activeLayer && (
-        <AreaStats
-          uploadedFeatures={uploadedLayers[0]?.data?.features}
-          activeLayer={activeLayer}
-          isDarkMode={isDarkMode}
-          map={mapRef.current?.getMap()}
-          positionClass="left-16" 
-        />
+        <>
+          <AreaStats
+            uploadedFeatures={uploadedLayers[0]?.data?.features}
+            activeLayer={activeLayer}
+            isDarkMode={isDarkMode}
+            map={mapRef.current?.getMap()}
+            positionClass="left-16"
+            onFeaturesDataChange={setUploadedAreaFeaturesData}
+          />
+          <DownloadButton
+            featuresData={uploadedAreaFeaturesData}
+            activeLayer={activeLayer}
+            uploadedFeatures={uploadedLayers[0]?.data?.features}
+            isDarkMode={isDarkMode}
+            positionClass="left-96"
+          />
+        </>
       )}
 
       {selectedDistrict && activeLayer && selectedDistrictGeometry && (
-        <AreaStats
-          uploadedFeatures={[{
-            type: 'Feature',
-            properties: {
-              name: districtPopupInfo?.NAMELSAD20 || 'Congressional District'
-            },
-            geometry: selectedDistrictGeometry
-          }]}
-          activeLayer={activeLayer}
-          isDarkMode={isDarkMode}
-          map={mapRef.current?.getMap()}
-          isCongressionalDistrict={true}
-          positionClass="right-16" 
-        />
+        <>
+          <AreaStats
+            uploadedFeatures={[{
+              type: 'Feature',
+              properties: {
+                name: districtPopupInfo?.NAMELSAD20 || 'Congressional District'
+              },
+              geometry: selectedDistrictGeometry
+            }]}
+            activeLayer={activeLayer}
+            isDarkMode={isDarkMode}
+            map={mapRef.current?.getMap()}
+            isCongressionalDistrict={true}
+            positionClass="right-16"
+            onFeaturesDataChange={setDistrictFeaturesData}
+          />
+          <DownloadButton
+            featuresData={districtFeaturesData}
+            activeLayer={activeLayer}
+            uploadedFeatures={[{
+              type: 'Feature',
+              properties: {
+                name: districtPopupInfo?.NAMELSAD20 || 'Congressional District'
+              },
+              geometry: selectedDistrictGeometry
+            }]}
+            isDarkMode={isDarkMode}
+            positionClass="right-96"
+          />
+        </>
       )}
 
-=
       </Map>
 
       {viewport.zoom > 5 && <MiniMap mainViewport={viewport} />}
