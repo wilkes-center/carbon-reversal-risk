@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { layers, additionalCompositeUrls, additionalCompositeHighUrls, additionalCompositeModeUrls, additionalCompositeGrLowUrls, additionalCompositeGrHighUrls, additionalCompositeGrModerateUrls } from '../../utils/map/layers';
 import { generatePaintProperty } from '../../utils/colors/colorScales';
+import { logger } from '../../utils/logger';
 
 const COMPOSITE_URLS = {
   compositeGbfLowSsp245: additionalCompositeUrls,
@@ -76,7 +77,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
 
       return true;
     } catch (error) {
-      console.error(`Error setting up layer ${layerId}:`, error);
+      logger.error(`Error setting up layer ${layerId}:`, error);
       return false;
     }
   }, [map, isDarkMode, getValueKey]);
@@ -89,13 +90,13 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
       setIsLoadingComposites(true);
       const urls = COMPOSITE_URLS[baseLayerId];
       if (!urls) {
-        console.error(`No composite URLs found for ${baseLayerId}`);
+        logger.error(`No composite URLs found for ${baseLayerId}`);
         return;
       }
 
       const getSourceLayer = SOURCE_LAYER_PATTERNS[baseLayerId];
       if (!getSourceLayer) {
-        console.error(`No source layer pattern found for ${baseLayerId}`);
+        logger.error(`No source layer pattern found for ${baseLayerId}`);
         return;
       }
 
@@ -130,7 +131,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
               setCompositeLayers(prev => new Set([...prev, compositeId]));
             }
           } catch (error) {
-            console.error(`Error setting up composite part ${partNumber} for ${baseLayerId}:`, error);
+            logger.error(`Error setting up composite part ${partNumber} for ${baseLayerId}:`, error);
           }
         }));
 
@@ -139,7 +140,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
       }
 
     } catch (error) {
-      console.error(`Error setting up composite layers for ${baseLayerId}:`, error);
+      logger.error(`Error setting up composite layers for ${baseLayerId}:`, error);
     } finally {
       setIsLoadingComposites(false);
     }
@@ -167,7 +168,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
         return next;
       });
     } catch (error) {
-      console.error(`Error removing layer ${layerId}:`, error);
+      logger.error(`Error removing layer ${layerId}:`, error);
     }
   }, [map]);
 
@@ -217,7 +218,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
           } else {
             // Add null checks for layers
             if (!layers) {
-              console.error('Layers array is undefined');
+              logger.error('Layers array is undefined');
               continue;
             }
             
@@ -229,7 +230,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
                 layerConfig.layer['source-layer']
               );
             } else {
-              console.warn(`Layer config not found for layer ID: ${layerId}`);
+              logger.warn(`Layer config not found for layer ID: ${layerId}`);
             }
           }
         }
@@ -237,7 +238,7 @@ export const useMapLayers = (map, activeLayers, activeBasemap, isDarkMode) => {
         // Force a map repaint to ensure all changes are applied
         map.triggerRepaint();
       } catch (error) {
-        console.error('Error updating layers:', error);
+        logger.error('Error updating layers:', error);
       }
     };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 // Red color palette
 const RED_COLORS = {
@@ -215,10 +216,10 @@ const getTargetElement = (targetSelector) => {
     }
     
     // Fallback: return body if nothing else works
-    console.warn(`Could not find element with selector: ${targetSelector}, falling back to body`);
+    logger.warn(`Could not find element with selector: ${targetSelector}, falling back to body`);
     return document.querySelector('body');
   } catch (error) {
-    console.error('Error finding target element:', error);
+    logger.error('Error finding target element:', error);
     return document.querySelector('body');
   }
 };
@@ -253,7 +254,7 @@ const GuidedTour = ({ isDarkMode }) => {
         setIsFirstVisit(false);
       }
     } catch (error) {
-      console.error('Error checking tour status:', error);
+      logger.error('Error checking tour status:', error);
     }
   }, []);
 
@@ -303,7 +304,7 @@ const GuidedTour = ({ isDarkMode }) => {
     
     const targetElement = getTargetElement(step.target);
     if (!targetElement) {
-      console.warn(`Target element "${step.target}" not found for tour step ${stepIndex}`);
+      logger.warn(`Target element "${step.target}" not found for tour step ${stepIndex}`);
       setArrowPosition({ visible: false });
       return;
     }
@@ -618,7 +619,7 @@ const GuidedTour = ({ isDarkMode }) => {
         completedAt: new Date().toISOString() 
       }));
     } catch (error) {
-      console.error('Error saving tour completion:', error);
+      logger.error('Error saving tour completion:', error);
     }
   };
 

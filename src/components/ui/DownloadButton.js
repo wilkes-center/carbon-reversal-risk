@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Download } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 const DownloadButton = ({ 
   featuresData = [], 
@@ -50,7 +51,7 @@ const DownloadButton = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error downloading data:', error);
+      logger.error('Error downloading data:', error);
       alert('An error occurred while downloading the data. Please try again.');
     }
   }, [featuresData, activeLayer, uploadedFeatures]);

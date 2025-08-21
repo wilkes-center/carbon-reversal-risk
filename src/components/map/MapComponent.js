@@ -29,6 +29,7 @@ import AreaStats from '../ui/AreaStats';
 import DownloadButton from '../ui/DownloadButton';
 import { useEnhancedMapLayer } from '../../hooks/layers/useEnhancedMapLayer';
 import GuidedTour from '../ui/GuidedTour';
+import { logger } from '../../utils/logger';
 
 const MapComponent = () => {
   const initialViewport = useMemo(() => ({
@@ -123,7 +124,7 @@ const MapComponent = () => {
       // Use the feature's geometry directly
       setSelectedDistrictGeometry(feature.geometry);
       
-      console.log('Selected district with geometry:', feature.geometry);
+      logger.log('Selected district with geometry:', feature.geometry);
     } else {
       setSelectedDistrict(null);
       setDistrictPopupInfo(null);
@@ -172,7 +173,7 @@ const MapComponent = () => {
       try {
         drawRef.current.deleteAll();
       } catch (err) {
-        console.warn('Error while clearing drawings:', err);
+        logger.warn('Error while clearing drawings:', err);
       }
     }
   }, []);
@@ -202,8 +203,8 @@ const MapComponent = () => {
 
   useEffect(() => {
     if (mapRef.current) {
-      console.log('Map instance available:', !!mapRef.current.getMap());
-      console.log('Map style loaded:', mapRef.current.getMap()?.isStyleLoaded());
+      logger.log('Map instance available:', !!mapRef.current.getMap());
+      logger.log('Map style loaded:', mapRef.current.getMap()?.isStyleLoaded());
     }
   }, [mapRef.current]);
 
@@ -265,7 +266,7 @@ const MapComponent = () => {
 }, [activeLayer, isDarkMode]);
 
   const handleDrawButtonClick = useCallback((mode) => {
-    console.log('Starting draw mode:', mode);
+    logger.log('Starting draw mode:', mode);
     setDrawMode(mode === 'draw_radius' ? 'draw_radius' : 'draw_polygon');
     setIsDrawActive(true);
     setDrawingInstructions(
@@ -396,8 +397,8 @@ const MapComponent = () => {
   }, [activeLayer, handleLayerUpdate]);
 
   const handleLegendRangeChange = useCallback((layerId, newRanges) => {
-    console.log('Legend range change for:', layerId);
-    console.log('New ranges:', newRanges);
+    logger.log('Legend range change for:', layerId);
+    logger.log('New ranges:', newRanges);
     
     if (!mapRef.current) return;
     const map = mapRef.current.getMap();
@@ -411,7 +412,7 @@ const MapComponent = () => {
     };
     
     const valueKey = getValueKey(layerId);
-    console.log('Using value key:', valueKey);
+    logger.log('Using value key:', valueKey);
 
     const newColorScale = [
         'interpolate',
@@ -419,7 +420,7 @@ const MapComponent = () => {
         ['get', valueKey],
         ...newRanges.flatMap(range => [range.value, range.color])
     ];
-    console.log('New color scale:', newColorScale);
+    logger.log('New color scale:', newColorScale);
 
     // Store the colors with the theme information
     setCustomLegendColors(prev => ({
@@ -561,9 +562,9 @@ const handleMapClick = useCallback((event) => {
         }
       });
       
-      console.log('Added highlight for feature:', feature.geometry.type);
+      logger.log('Added highlight for feature:', feature.geometry.type);
     } catch (error) {
-      console.error('Error highlighting feature:', error);
+      logger.error('Error highlighting feature:', error);
     }
   } else {
     setPopupInfo(null);
@@ -607,7 +608,7 @@ const handleMapClick = useCallback((event) => {
       });
   
     } catch (error) {
-      console.warn(`Error removing outlines for layer ${layerId}:`, error);
+      logger.warn(`Error removing outlines for layer ${layerId}:`, error);
     }
   }, [mapRef]);
   
@@ -630,14 +631,14 @@ const handleMapClick = useCallback((event) => {
   
         // Add null checks for layers
         if (!layers) {
-          console.error('Layers array is undefined');
+          logger.error('Layers array is undefined');
           resolve();
           return;
         }
 
         const layerConfig = layers.find(l => l.id === layerId);
         if (!layerConfig) {
-          console.warn(`Layer config not found for layer ID: ${layerId}`);
+          logger.warn(`Layer config not found for layer ID: ${layerId}`);
           resolve();
           return;
         }
@@ -801,7 +802,7 @@ const handleMapClick = useCallback((event) => {
       }, 100);
 
     } catch (error) {
-      console.error('Error handling bounds change:', error);
+      logger.error('Error handling bounds change:', error);
     }
   }, [mapRef, activeLayer, removeOutlines]);
 
@@ -824,7 +825,7 @@ const handleMapClick = useCallback((event) => {
         map.removeSource(highlightLayerId);
       }
     } catch (error) {
-      console.error('Error clearing highlight:', error);
+      logger.error('Error clearing highlight:', error);
     }
   }, []);
 
@@ -832,7 +833,7 @@ const handleMapClick = useCallback((event) => {
     try {
       // Check if the group and variant exist
       if (!layerGroups[groupId] || !layerGroups[groupId].layers || !layerGroups[groupId].layers[variantId]) {
-        console.error(`Layer not found for group: ${groupId}, variant: ${variantId}`);
+        logger.error(`Layer not found for group: ${groupId}, variant: ${variantId}`);
         return;
       }
       
@@ -866,7 +867,7 @@ const handleMapClick = useCallback((event) => {
         return prevActiveLayer === layerId ? null : layerId;
       });
     } catch (error) {
-      console.error('Error toggling layer:', error);
+      logger.error('Error toggling layer:', error);
     }
   }, [layerGroups, clearHighlight]);
 
@@ -908,7 +909,7 @@ const handleMapClick = useCallback((event) => {
       clearDrawings();
 
     } catch (error) {
-      console.error('Error in handleDownloadData:', error);
+      logger.error('Error in handleDownloadData:', error);
       alert('An error occurred while preparing the download. Please try again.');
     }
   }, [drawnFeatures, mapRef, clearDrawings]);
@@ -930,24 +931,24 @@ const getBoundsFromFeatures = (features) => {
 };
 
   const isValidGeoJSON = (geoJSON) => {
-    console.log('Validating GeoJSON:', JSON.stringify(geoJSON, null, 2));
+    logger.log('Validating GeoJSON:', JSON.stringify(geoJSON, null, 2));
     if (!geoJSON || typeof geoJSON !== 'object') {
-      console.log('GeoJSON is not an object');
+      logger.log('GeoJSON is not an object');
       return false;
     }
     if (geoJSON.type !== 'FeatureCollection') {
-      console.log('GeoJSON type is not FeatureCollection, it is:', geoJSON.type);
+      logger.log('GeoJSON type is not FeatureCollection, it is:', geoJSON.type);
       return false;
     }
     if (!Array.isArray(geoJSON.features)) {
-      console.log('GeoJSON does not have a features array');
+      logger.log('GeoJSON does not have a features array');
       return false;
     }
     if (geoJSON.features.length === 0) {
-      console.log('GeoJSON features array is empty');
+      logger.log('GeoJSON features array is empty');
       return false;
     }
-    console.log('GeoJSON is valid');
+    logger.log('GeoJSON is valid');
     return true;
   };
 
@@ -1013,7 +1014,7 @@ const getBoundsFromFeatures = (features) => {
             mapRef.current.fitBounds(bounds, { padding: 40, duration: 1000 });
         }
     } catch (error) {
-        console.error('Error processing uploaded file:', error);
+        logger.error('Error processing uploaded file:', error);
         setUploadError(error.message);
     }
 }, []);
@@ -1058,7 +1059,7 @@ const getBoundsFromFeatures = (features) => {
                 map.removeControl(drawRef.current);
                 drawRef.current = null;
               } catch (err) {
-                console.warn('Error cleaning up draw tools:', err);
+                logger.warn('Error cleaning up draw tools:', err);
               }
             }
 
@@ -1072,12 +1073,12 @@ const getBoundsFromFeatures = (features) => {
                   map.removeSource(activeLayer);
                 }
               } catch (err) {
-                console.warn('Error cleaning up active layer:', err);
+                logger.warn('Error cleaning up active layer:', err);
               }
             }
           }
         } catch (err) {
-          console.warn('Error during map cleanup:', err);
+          logger.warn('Error during map cleanup:', err);
         }
       }
     };

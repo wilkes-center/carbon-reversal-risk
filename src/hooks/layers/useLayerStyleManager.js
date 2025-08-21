@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { generatePaintProperty } from '../../utils/colors/colorScales';
 import { debounce } from 'lodash';
+import { logger } from '../../utils/logger';
 
 const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) => {
   const isUpdatingRef = useRef(false);
@@ -34,7 +35,7 @@ const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) 
           isUpdatingRef.current = false;
         });
       } catch (error) {
-        console.warn('Error in batch update:', error);
+        logger.warn('Error in batch update:', error);
         isUpdatingRef.current = false;
       }
     }, 50),
@@ -77,7 +78,7 @@ const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) 
       batchUpdateStyles();
 
     } catch (error) {
-      console.warn(`Error queueing style update for ${layerId}:`, error);
+      logger.warn(`Error queueing style update for ${layerId}:`, error);
     }
   }, [map, activeLayer, isDarkMode, legendStateManager, batchUpdateStyles]);
 

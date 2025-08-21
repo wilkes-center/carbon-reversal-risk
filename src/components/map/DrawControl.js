@@ -3,6 +3,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { useMap } from 'react-map-gl';
 import { Lasso, X } from 'lucide-react';
 import * as turf from '@turf/turf';
+import { logger } from '../../utils/logger';
 
 const createRadiusMode = () => ({
   onSetup: function() {
@@ -94,7 +95,7 @@ const DrawControl = forwardRef(({
         try {
           drawRef.current.deleteAll();
         } catch (err) {
-          console.warn('Error deleting all features:', err);
+          logger.warn('Error deleting all features:', err);
         }
       }
     },
@@ -103,7 +104,7 @@ const DrawControl = forwardRef(({
         try {
           return drawRef.current.getAll();
         } catch (err) {
-          console.warn('Error getting all features:', err);
+          logger.warn('Error getting all features:', err);
           return { features: [] };
         }
       }
@@ -127,7 +128,7 @@ const DrawControl = forwardRef(({
         // Then remove the control
         map.removeControl(drawRef.current);
       } catch (err) {
-        console.warn('Error removing draw control:', err);
+        logger.warn('Error removing draw control:', err);
       }
       drawRef.current = null;
     }
@@ -188,7 +189,7 @@ const DrawControl = forwardRef(({
       drawRef.current = draw;
       map.addControl(draw);
     } catch (err) {
-      console.error('Error initializing draw control:', err);
+      logger.error('Error initializing draw control:', err);
     }
 
     return () => {
@@ -201,22 +202,22 @@ const DrawControl = forwardRef(({
     if (!map || !drawRef.current) return;
 
     const handleCreate = (e) => {
-      console.log('Draw created:', e);
+      logger.log('Draw created:', e);
       onDrawComplete(e.features);
     };
 
     const handleUpdate = (e) => {
-      console.log('Draw updated:', e);
+      logger.log('Draw updated:', e);
       onDrawComplete(e.features);
     };
 
     const handleDelete = () => {
-      console.log('Draw deleted');
+      logger.log('Draw deleted');
       onDrawComplete([]);
     };
 
     const handleModeChange = (e) => {
-      console.log('Mode changed:', e.mode);
+      logger.log('Mode changed:', e.mode);
       if (e.mode === 'simple_select' && drawRef.current.getAll().features.length > 0) {
         onDrawComplete(drawRef.current.getAll().features);
       }
@@ -239,14 +240,14 @@ const DrawControl = forwardRef(({
       try {
         drawRef.current.changeMode(drawMode);
       } catch (err) {
-        console.warn('Error changing draw mode:', err);
+        logger.warn('Error changing draw mode:', err);
       }
     } else if (drawRef.current) {
       try {
         drawRef.current.changeMode('simple_select');
         drawRef.current.deleteAll();
       } catch (err) {
-        console.warn('Error resetting draw mode:', err);
+        logger.warn('Error resetting draw mode:', err);
       }
     }
 

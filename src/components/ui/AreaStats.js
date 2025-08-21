@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import * as turf from '@turf/turf';
+import { logger } from '../../utils/logger';
 
 const AreaStats = ({ 
   uploadedFeatures, 
@@ -35,7 +36,7 @@ const AreaStats = ({
         highQuality: true
       });
     } catch (error) {
-      console.warn('Error creating safe polygon:', error);
+      logger.warn('Error creating safe polygon:', error);
       return null;
     }
   }, [uploadedFeatures]);
@@ -108,12 +109,12 @@ const AreaStats = ({
               }
             }
           } catch (error) {
-            console.warn('Error processing feature:', error);
+            logger.warn('Error processing feature:', error);
           }
         });
       }
   
-      console.log(`Found ${allFeatures.length} features in the selected area`);
+      logger.log(`Found ${allFeatures.length} features in the selected area`);
       
       if (allFeatures.length > 0) {
         const values = allFeatures.map(f => f.value);
@@ -129,12 +130,12 @@ const AreaStats = ({
         });
         onFeaturesDataChange?.(allFeatures);
       } else {
-        console.log('No features found in the selected area');
+        logger.log('No features found in the selected area');
         setStats(null);
         onFeaturesDataChange?.([]);
       }
     } catch (error) {
-      console.error('Error calculating stats:', error);
+      logger.error('Error calculating stats:', error);
       setStats(null);
     } finally {
       setIsCalculating(false);

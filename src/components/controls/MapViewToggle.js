@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { Globe2 } from 'lucide-react';
 import usaIcon from '../../assets/usa.png';
+import { logger } from '../../utils/logger';
 
 const US_BOUNDS = {
   center: [-98.5795, 39.8283],
@@ -66,7 +67,7 @@ const MapViewToggle = ({
         }
       });
     } catch (error) {
-      console.error('Error during view transition:', error);
+      logger.error('Error during view transition:', error);
       setView(newView);
     }
   }, [mapRef, setView, activeLayer]);

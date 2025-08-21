@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { Layers, ZoomIn, ZoomOut, Compass, Trash2, Moon, Sun } from 'lucide-react';
 import MapViewToggle from './MapViewToggle';
+import { logger } from '../../utils/logger';
 
 const MapControls = ({ 
   view,
@@ -65,7 +66,7 @@ const MapControls = ({
           });
         }
       } catch (error) {
-        console.warn(`Error during zoom ${direction}:`, error);
+        logger.warn(`Error during zoom ${direction}:`, error);
       }
     });
   }, [mapRef, safeLayerOperation]);
@@ -80,7 +81,7 @@ const MapControls = ({
           duration: 300
         });
       } catch (error) {
-        console.warn('Error resetting north:', error);
+        logger.warn('Error resetting north:', error);
       }
     });
   }, [mapRef, safeLayerOperation]);

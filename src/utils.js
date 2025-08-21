@@ -1,6 +1,8 @@
+import { logger } from './utils/logger';
+
 export const formatLayerName = (name) => {
   if (typeof name !== 'string') {
-    console.error('formatLayerName received a non-string value:', name);
+    logger.error('formatLayerName received a non-string value:', name);
     return String(name); // Convert to string or return a default value
   }
   return name

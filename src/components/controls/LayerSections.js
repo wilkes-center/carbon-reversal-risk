@@ -4,6 +4,7 @@ import { Download, X, Lasso, Circle } from 'lucide-react';
 import FileUploadControl from './FileUploadControl';
 import { LayerButton, truncateFilename } from './PanelUIComponents';
 import InfoTooltip from '../ui/InfoTooltip';
+import { logger } from '../../utils/logger';
 
 // Layer Group Component
 export const LayerGroup = ({ title, variants, groupId, activeLayer, onToggle, isDarkMode }) => {
@@ -22,7 +23,7 @@ export const LayerGroup = ({ title, variants, groupId, activeLayer, onToggle, is
     if (groupId.name === 'Reversal Risk SSP245') return 'reversalRiskSSP245';
     if (groupId.name === 'Combined Risk Absolute Reversal') return 'combinedRisk';
     
-    console.error('Unknown layer group:', groupId);
+    logger.error('Unknown layer group:', groupId);
     return null;
   };
   

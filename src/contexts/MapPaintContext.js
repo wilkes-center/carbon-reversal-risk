@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import { debounce } from 'lodash';
+import { logger } from '../utils/logger';
 
 const initialState = {
   paintProperties: {},
@@ -69,7 +70,7 @@ export function MapPaintProvider({ children, map }) {
           }
         }
       } catch (error) {
-        console.warn(`Error applying opacity to ${layerId}:`, error);
+        logger.warn(`Error applying opacity to ${layerId}:`, error);
       }
     }, 100),
     [map, state.layerOpacities]

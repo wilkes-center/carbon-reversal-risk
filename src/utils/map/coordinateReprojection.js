@@ -1,4 +1,5 @@
 import proj4 from 'proj4';
+import { logger } from '../logger';
 
 // Define common coordinate reference systems
 const CRS_DEFINITIONS = {
@@ -18,7 +19,7 @@ const transformToWGS84 = (coords, sourceProj) => {
   try {
     return proj4(sourceProj, CRS_DEFINITIONS.WGS84, coords);
   } catch (error) {
-    console.warn('Error transforming coordinates:', error);
+    logger.warn('Error transforming coordinates:', error);
     return null;
   }
 };
@@ -145,7 +146,7 @@ const hasReasonableBounds = (feature) => {
   
   // Check if bounds are valid WGS84
   if (minLng < -180 || maxLng > 180 || minLat < -90 || maxLat > 90) {
-    console.warn('Feature has invalid WGS84 bounds:', { minLng, maxLng, minLat, maxLat });
+    logger.warn('Feature has invalid WGS84 bounds:', { minLng, maxLng, minLat, maxLat });
     return false;
   }
   
@@ -154,7 +155,7 @@ const hasReasonableBounds = (feature) => {
   const latSpan = maxLat - minLat;
   
   if (lngSpan > 180 || latSpan > 90) {
-    console.warn('Feature spans unrealistic area:', { lngSpan, latSpan });
+    logger.warn('Feature spans unrealistic area:', { lngSpan, latSpan });
     return false;
   }
   
@@ -183,7 +184,7 @@ export const processGeoJSON = (geojson) => {
     return null;
   }
 
-  console.log('Processing GeoJSON with', featureCollection.features.length, 'input features');
+  logger.log('Processing GeoJSON with', featureCollection.features.length, 'input features');
   
   // First pass: identify which features might be valid
   const featureBounds = featureCollection.features.map(feature => {
@@ -212,7 +213,7 @@ export const processGeoJSON = (geojson) => {
   // Log bounds of all features for debugging
   featureBounds.forEach((bounds, idx) => {
     if (bounds) {
-      console.log(`Feature ${idx} bounds:`, {
+      logger.log(`Feature ${idx} bounds:`, {
         lng: [bounds.minLng, bounds.maxLng],
         lat: [bounds.minLat, bounds.maxLat]
       });
@@ -232,7 +233,7 @@ export const processGeoJSON = (geojson) => {
       
       const bounds = featureBounds[i];
       if (bounds) {
-        console.log(`Feature ${i} accepted with bounds:`, {
+        logger.log(`Feature ${i} accepted with bounds:`, {
           lng: [bounds.minLng, bounds.maxLng],
           lat: [bounds.minLat, bounds.maxLat]
         });
@@ -251,15 +252,15 @@ export const processGeoJSON = (geojson) => {
   }
   
   if (invalidFeatures.length > 0) {
-    console.warn(`Filtered out ${invalidFeatures.length} invalid features:`, invalidFeatures);
+    logger.warn(`Filtered out ${invalidFeatures.length} invalid features:`, invalidFeatures);
   }
 
   if (validFeatures.length === 0) {
-    console.warn('No valid features after processing');
+    logger.warn('No valid features after processing');
     return null;
   }
 
-  console.log('Successfully processed', validFeatures.length, 'valid features out of', featureCollection.features.length);
+  logger.log('Successfully processed', validFeatures.length, 'valid features out of', featureCollection.features.length);
   return {
     type: 'FeatureCollection',
     features: validFeatures

@@ -1,3 +1,5 @@
+import { logger } from '../logger';
+
 // Value ranges for different layer types
 const scaleRanges = {
   buffer: [0, 3, 5, 10, 20, 30, 60, 80, 100, 300],
@@ -97,7 +99,7 @@ export const generatePaintProperty = (layerId, isDarkMode) => {
   try {
     // Debug logging for SSP370 layers
     if (layerId && layerId.includes('SSP370')) {
-      console.log('🔍 Generating paint property for SSP370 layer:', layerId);
+      logger.log('🔍 Generating paint property for SSP370 layer:', layerId);
     }
     
     const scaleRanges = {
@@ -211,7 +213,7 @@ export const generatePaintProperty = (layerId, isDarkMode) => {
       'fill-opacity': 0.7
     };
   } catch (error) {
-    console.error(`Error generating paint property for layer ${layerId}:`, error);
+    logger.error(`Error generating paint property for layer ${layerId}:`, error);
     // default paint object as a fallback
     return {
       'fill-color': isDarkMode ? '#023047' : '#ffffd4',
@@ -228,7 +230,7 @@ export const getLegendConfig = (layerId, isDarkMode) => {
   const scale = createColorScales(isDarkMode)[baseLayerId];
   
   if (!scale) {
-    console.warn(`No scale found for ${baseLayerId}`);
+    logger.warn(`No scale found for ${baseLayerId}`);
     return [];
   }
 

@@ -1,4 +1,5 @@
 import { createColorScales, generatePaintProperty } from '../colors/colorScales';
+import { logger } from '../logger';
 
 export const createLayer = (layerConfig, isDarkMode) => {
   const { id, source, layer } = layerConfig;
@@ -373,27 +374,27 @@ const LAYER_MAX_PARTS = {
 export const handleCompositeLayers = async (map, baseLayerId, additionalUrls, isDarkMode) => {
   if (!map || !map.isStyleLoaded()) return;
 
-  console.log(`Handling composite layers for ${baseLayerId}`);
+  logger.log(`Handling composite layers for ${baseLayerId}`);
   const totalParts = LAYER_MAX_PARTS[baseLayerId] || 21;
-  console.log(`Loading ${totalParts} parts for ${baseLayerId}`);
+  logger.log(`Loading ${totalParts} parts for ${baseLayerId}`);
 
   try {
     // Handle base layer
     const baseLayer = baseLayerConfigs.find(config => config.id === baseLayerId);
     if (!baseLayer) {
-      console.error(`Base layer config not found for ${baseLayerId}`);
+      logger.error(`Base layer config not found for ${baseLayerId}`);
       return;
     }
 
     // Add base source if it doesn't exist
     if (!map.getSource(baseLayerId)) {
-      console.log(`Adding base source for ${baseLayerId} (part 1)`);
+      logger.log(`Adding base source for ${baseLayerId} (part 1)`);
       await map.addSource(baseLayerId, baseLayer.source);
     }
 
     // Add base layer if it doesn't exist
     if (!map.getLayer(baseLayerId)) {
-      console.log(`Adding base layer for ${baseLayerId} (part 1)`);
+      logger.log(`Adding base layer for ${baseLayerId} (part 1)`);
       const paintProperties = generatePaintProperty(baseLayerId, isDarkMode);
       await map.addLayer({
         ...baseLayer.layer,
@@ -415,7 +416,7 @@ export const handleCompositeLayers = async (map, baseLayerId, additionalUrls, is
       try {
         // Add source if it doesn't exist
         if (!map.getSource(sourceId)) {
-          console.log(`Adding source for part ${partNumber} of ${baseLayerId}: ${url}`);
+          logger.log(`Adding source for part ${partNumber} of ${baseLayerId}: ${url}`);
           await map.addSource(sourceId, {
             type: 'vector',
             url
@@ -424,7 +425,7 @@ export const handleCompositeLayers = async (map, baseLayerId, additionalUrls, is
           // Add error listener for source
           map.on('error', function errorHandler(e) {
             if (e.sourceId === sourceId) {
-              console.error(`✗ Source error for part ${partNumber} of ${baseLayerId}:`, e.error);
+              logger.error(`✗ Source error for part ${partNumber} of ${baseLayerId}:`, e.error);
               map.off('error', errorHandler);
             }
           });
@@ -448,29 +449,29 @@ export const handleCompositeLayers = async (map, baseLayerId, additionalUrls, is
           // Verify the layer was added successfully
           if (map.getLayer(layerId)) {
             successCount++;
-            console.log(`✓ Successfully added part ${partNumber} for ${baseLayerId}`);
+            logger.log(`✓ Successfully added part ${partNumber} for ${baseLayerId}`);
             
             // Check if source has loaded
             const source = map.getSource(sourceId);
             if (source) {
               map.on('sourcedata', function sourceLoadHandler(e) {
                 if (e.sourceId === sourceId && e.isSourceLoaded) {
-                  console.log(`✓ Source loaded for part ${partNumber} of ${baseLayerId}`);
+                  logger.log(`✓ Source loaded for part ${partNumber} of ${baseLayerId}`);
                   map.off('sourcedata', sourceLoadHandler);
                 }
               });
             }
           } else {
-            console.error(`✗ Failed to add layer ${layerId}`);
+            logger.error(`✗ Failed to add layer ${layerId}`);
           }
         } else {
-          console.log(`Layer ${layerId} already exists`);
+          logger.log(`Layer ${layerId} already exists`);
         }
 
         // Longer delay between adding layers to prevent rate limiting
         await new Promise(resolve => setTimeout(resolve, 200));
       } catch (error) {
-        console.error(`✗ Error adding part ${partNumber} for ${baseLayerId}:`, {
+        logger.error(`✗ Error adding part ${partNumber} for ${baseLayerId}:`, {
           error: error.message,
           url,
           sourceLayer
@@ -482,7 +483,7 @@ export const handleCompositeLayers = async (map, baseLayerId, additionalUrls, is
           if (map.getLayer(layerId)) map.removeLayer(layerId);
           if (map.getSource(sourceId)) map.removeSource(sourceId);
         } catch (cleanupError) {
-          console.warn(`Cleanup error for part ${partNumber}:`, cleanupError.message);
+          logger.warn(`Cleanup error for part ${partNumber}:`, cleanupError.message);
         }
         
         // Add delay after error to prevent rapid retries
@@ -491,13 +492,13 @@ export const handleCompositeLayers = async (map, baseLayerId, additionalUrls, is
       }
     }
     
-    console.log(`${baseLayerId}: Successfully loaded ${successCount}/${totalParts} parts`);
+    logger.log(`${baseLayerId}: Successfully loaded ${successCount}/${totalParts} parts`);
     if (failedParts.length > 0) {
-      console.warn(`${baseLayerId}: Failed to load parts: ${failedParts.join(', ')}`);
+      logger.warn(`${baseLayerId}: Failed to load parts: ${failedParts.join(', ')}`);
     }
 
   } catch (error) {
-    console.error(`Error handling composite layers for ${baseLayerId}:`, error);
+    logger.error(`Error handling composite layers for ${baseLayerId}:`, error);
   }
 };
 

@@ -4,6 +4,7 @@ import { Upload, Loader } from 'lucide-react';
 import JSZip from 'jszip';
 import { handleShapefile } from '../../utils/map/shapefileHandler';
 import { processGeoJSON } from '../../utils/map/coordinateReprojection';
+import { logger } from '../../utils/logger';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const ACCEPTED_FORMATS = {
@@ -205,7 +206,7 @@ const FileUploadControl = ({ onFileUpload, setUploadStatus }) => {
       onFileUpload(geoJSON, file.name);
     } catch (error) {
       setUploadStatus(`Error: ${error.message}`);
-      console.error('File processing error:', error);
+      logger.error('File processing error:', error);
     } finally {
       setIsLoading(false);
     }

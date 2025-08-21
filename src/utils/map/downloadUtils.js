@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
+import { logger } from '../logger';
 
 const getFeatureValueKey = (layerId) => {
   if (layerId.includes('DroughtRisk')) return 'drought_risk';
@@ -25,7 +26,7 @@ const calculateCircleProperties = (feature) => {
       areaKm2: area
     };
   } catch (error) {
-    console.error('Error calculating circle properties:', error);
+    logger.error('Error calculating circle properties:', error);
     return null;
   }
 };
@@ -46,7 +47,7 @@ const generateDownloadFileName = (layerId, downloadInfo) => {
       areaInfo = `_viewport_${south.toFixed(2)}N_${west.toFixed(2)}E_${north.toFixed(2)}N_${east.toFixed(2)}E`;
     }
   } catch (error) {
-    console.error('Error generating filename:', error);
+    logger.error('Error generating filename:', error);
     areaInfo = '_download';
   }
 
@@ -61,7 +62,7 @@ const isCircularPolygon = (coordinates) => {
 
 export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = []) => {
   if (!map) {
-    console.error('Map instance is not available');
+    logger.error('Map instance is not available');
     return;
   }
 
@@ -76,7 +77,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
     // Process drawn features
     if (drawnFeatures && drawnFeatures.length > 0) {
       const drawnFeature = drawnFeatures[0];
-      console.log('Processing drawn feature:', drawnFeature);
+      logger.log('Processing drawn feature:', drawnFeature);
 
       // Store the filter area for feature filtering
       filterArea = {
@@ -117,7 +118,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
           filter: ['>', ['get', valueKey], 0]
         });
       } catch (error) {
-        console.warn(`Error querying features for layer ${layerId}:`, error);
+        logger.warn(`Error querying features for layer ${layerId}:`, error);
         return [];
       }
     };
@@ -149,7 +150,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
           const point = turf.point(coordinates);
           return turf.booleanPointInPolygon(point, filterArea);
         } catch (error) {
-          console.warn('Error filtering feature:', error);
+          logger.warn('Error filtering feature:', error);
           return false;
         }
       });
@@ -177,7 +178,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
           uniqueFeatures.set(key, feature);
         }
       } catch (error) {
-        console.warn('Error processing feature:', error);
+        logger.warn('Error processing feature:', error);
       }
     });
 
@@ -198,7 +199,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
         const value = feature.properties[valueKey];
         return `${index},${latitude.toFixed(6)},${longitude.toFixed(6)},${value}`;
       } catch (error) {
-        console.warn('Error generating CSV row:', error);
+        logger.warn('Error generating CSV row:', error);
         return null;
       }
     }).filter(Boolean);
@@ -218,7 +219,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
     URL.revokeObjectURL(url);
 
   } catch (error) {
-    console.error('Error in downloadLayerDataAsCSV:', error);
+    logger.error('Error in downloadLayerDataAsCSV:', error);
     alert('An error occurred while downloading the data. Please try again.');
   }
 };
@@ -240,7 +241,7 @@ export const getBoundsFromFeatures = (features) => {
   try {
     return turf.bbox(turf.featureCollection(features));
   } catch (error) {
-    console.error('Error getting bounds from features:', error);
+    logger.error('Error getting bounds from features:', error);
     return null;
   }
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Loader, X } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 const SearchBar = ({ 
   searchQuery, 
@@ -53,7 +54,7 @@ const SearchBar = ({
         setError('No results found');
       }
     } catch (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', error);
       setError('Error searching location');
     } finally {
       setIsSearching(false);

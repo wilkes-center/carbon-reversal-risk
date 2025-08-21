@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 const NotificationItem = ({ message, isDarkMode, index }) => (
   <motion.div
@@ -27,13 +28,13 @@ const UploadNotification = ({ uploadStatus, isDarkMode }) => {
 
   // Debug log
   useEffect(() => {
-    console.log('Current uploadStatus:', uploadStatus);
-    console.log('Current notifications:', notifications);
+    logger.log('Current uploadStatus:', uploadStatus);
+    logger.log('Current notifications:', notifications);
   }, [uploadStatus, notifications]);
 
   useEffect(() => {
     if (uploadStatus) {
-      console.log('Adding new notification:', uploadStatus); // Debug log
+      logger.log('Adding new notification:', uploadStatus); // Debug log
       const newNotification = {
         id: Date.now(),
         message: uploadStatus
@@ -43,7 +44,7 @@ const UploadNotification = ({ uploadStatus, isDarkMode }) => {
 
       // Remove after 3 seconds
       setTimeout(() => {
-        console.log('Removing notification:', uploadStatus); // Debug log
+        logger.log('Removing notification:', uploadStatus); // Debug log
         setNotifications(prev => 
           prev.filter(notification => notification.id !== newNotification.id)
         );

@@ -1,6 +1,7 @@
 import * as shp from 'shpjs';
 import JSZip from 'jszip';
 import proj4 from 'proj4';
+import { logger } from '../logger';
 
 // Define common coordinate reference systems with more precise definitions
 const CRS_DEFINITIONS = {
@@ -26,7 +27,7 @@ const mercatorToWGS84 = (coords) => {
   try {
     return proj4(CRS_DEFINITIONS.EPSG3857, CRS_DEFINITIONS.WGS84, coords);
   } catch (error) {
-    console.warn('Error transforming coordinates:', error);
+    logger.warn('Error transforming coordinates:', error);
     return null;
   }
 };
@@ -144,7 +145,7 @@ export const handleShapefile = async (file, onStatusUpdate = () => {}) => {
     };
 
   } catch (error) {
-    console.error('Shapefile processing error:', error);
+    logger.error('Shapefile processing error:', error);
     throw new Error(`Failed to process shapefile: ${error.message}`);
   }
 };

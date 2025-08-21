@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { generatePaintProperty } from '../../utils/colors/colorScales';
 import { layers } from '../../utils/map/layers';
+import { logger } from '../../utils/logger';
 
 const COMPOSITE_CONFIG = {
   compositeGbfLowSsp245: {
@@ -49,7 +50,7 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
   // Force refresh function to trigger tile reload
   const forceRefreshTiles = useCallback(() => {
     setRefreshCounter(prev => prev + 1);
-    console.log('Forcing tile refresh...');
+    logger.log('Forcing tile refresh...');
   }, []);
 
   const cleanupLayer = useCallback((layerId) => {
@@ -67,7 +68,7 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
         }
       }
     } catch (error) {
-      console.warn(`Error cleaning up layer ${layerId}:`, error);
+      logger.warn(`Error cleaning up layer ${layerId}:`, error);
     }
   }, [map]);
 
@@ -167,7 +168,7 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
               
               if (map.getLayer(id)) {
                 loadedCount++;
-                console.log(`✓ Hook: Added part ${partNum} for ${baseLayerId}`);
+                logger.log(`✓ Hook: Added part ${partNum} for ${baseLayerId}`);
                 return true;
               }
             }
@@ -175,10 +176,10 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
           } catch (error) {
             retries--;
             if (retries > 0) {
-              console.warn(`Retrying part ${partNum} for ${baseLayerId} (${retries} retries left)`);
+              logger.warn(`Retrying part ${partNum} for ${baseLayerId} (${retries} retries left)`);
               await new Promise(resolve => setTimeout(resolve, 200));
             } else {
-              console.error(`✗ Hook: Failed part ${partNum} for ${baseLayerId} after retries:`, error.message);
+              logger.error(`✗ Hook: Failed part ${partNum} for ${baseLayerId} after retries:`, error.message);
               return false;
             }
           }
@@ -203,18 +204,18 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
         }
       }
       
-      console.log(`Loaded ${loadedCount} parts for composite layer ${baseLayerId}`);
+      logger.log(`Loaded ${loadedCount} parts for composite layer ${baseLayerId}`);
       
       // Pre-warm tiles by triggering a map repaint
       if (map && typeof map.triggerRepaint === 'function') {
         setTimeout(() => {
           map.triggerRepaint();
-          console.log('Triggered map repaint for tile pre-warming');
+          logger.log('Triggered map repaint for tile pre-warming');
         }, 500);
       }
       setIsLoading(false);
     } catch (error) {
-      console.warn('Error setting up composite layer:', error);
+      logger.warn('Error setting up composite layer:', error);
       setIsLoading(false);
     }
   }, [map, isDarkMode, refreshCounter]);
@@ -226,14 +227,14 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
 
     // Add null checks for layers
     if (!layers) {
-      console.error('Layers array is undefined');
+      logger.error('Layers array is undefined');
       setIsLoading(false);
       return;
     }
 
     const layerConfig = layers.find(l => l.id === activeLayer);
     if (!layerConfig) {
-      console.warn(`Layer config not found for layer ID: ${activeLayer}`);
+      logger.warn(`Layer config not found for layer ID: ${activeLayer}`);
       setIsLoading(false);
       return;
     }
