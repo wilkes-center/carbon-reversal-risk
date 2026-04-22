@@ -16,11 +16,11 @@ export const LayerGroup = ({ title, variants, groupId, activeLayer, onToggle, is
     
     // For objects like layerGroups.globalBufferPool
     if (groupId.name === 'Global Buffer Pool') return 'globalBufferPool';
-    if (groupId.name === 'Global Reversal') return 'globalReversal';
+    if (groupId.name === 'Global Reversal Probability') return 'globalReversal';
     if (groupId.name === 'Buffer Pool') return 'bufferPool';
-    if (groupId.name === 'Reversal Risk SSP585') return 'reversalRiskSSP585';
-    if (groupId.name === 'Reversal Risk SSP370') return 'reversalRiskSSP370';
-    if (groupId.name === 'Reversal Risk SSP245') return 'reversalRiskSSP245';
+    if (groupId.name === 'Reversal Probability SSP585') return 'reversalRiskSSP585';
+    if (groupId.name === 'Reversal Probability SSP370') return 'reversalRiskSSP370';
+    if (groupId.name === 'Reversal Probability SSP245') return 'reversalRiskSSP245';
     if (groupId.name === 'Combined Risk Absolute Reversal') return 'combinedRisk';
     
     logger.error('Unknown layer group:', groupId);

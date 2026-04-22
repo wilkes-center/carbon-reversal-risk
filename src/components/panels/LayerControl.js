@@ -112,7 +112,7 @@ const LayerControl = ({
                 />
 
                 <LayerGroup
-                  title="Global Reversal"
+                  title="Global Reversal Probability"
                   variants={layerGroups.globalReversal.variants}
                   groupId={layerGroups.globalReversal}
                   activeLayer={activeLayer}

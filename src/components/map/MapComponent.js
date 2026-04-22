@@ -306,7 +306,7 @@ const MapComponent = () => {
       }
     },
     globalReversal: {
-      name: 'Global Reversal',
+      name: 'Global Reversal Probability',
       variants: ['low', 'moderate', 'high'],
       layers: {
         low: 'compositeGrLowSsp245',
@@ -315,7 +315,7 @@ const MapComponent = () => {
       }
     },
     reversalRiskSSP585: {
-      name: 'Reversal Risk SSP585',
+      name: 'Reversal Probability SSP585',
       variants: ['Insect', 'Drought', 'Fire'],
       layers: {
         Insect: 'InsectRiskSSP585',
@@ -324,7 +324,7 @@ const MapComponent = () => {
       }
     },
     reversalRiskSSP245: {
-      name: 'Reversal Risk SSP245',
+      name: 'Reversal Probability SSP245',
       variants: ['Insect', 'Drought', 'Fire'],
       layers: {
         Insect: 'InsectRiskSSP245',
@@ -333,7 +333,7 @@ const MapComponent = () => {
       }
     },
     reversalRiskSSP370: {
-      name: 'Reversal Risk SSP370',
+      name: 'Reversal Probability SSP370',
       variants: ['Insect', 'Drought', 'Fire'],
       layers: {
         Insect: 'InsectRiskSSP370',

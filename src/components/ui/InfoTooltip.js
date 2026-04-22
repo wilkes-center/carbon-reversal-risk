@@ -4,11 +4,12 @@ import { Info, X } from 'lucide-react';
 
   const getLayerDescription = (title) => {
     const descriptions = {
-      "Global Buffer Pool": "Global assessment of the buffer pool needed to secure forest carbon offsets. Displays worldwide estimates of the carbon storage capacity required to counteract disturbances.",
-      "Global Reversal": "Global evaluation of carbon reversal risk, indicating the potential loss of forest carbon stocks due to climate-sensitive disturbances. Measured on a risk index (0-100).",
-      "Buffer Pool": "Provides the estimated buffer pool contribution required to offset carbon losses in forests, based on aggregated disturbance risks.",
-      "Reversal Risk SSP585": "Displays carbon reversal risk under a high-emissions scenario (SSP5-8.5). Highlights regions most vulnerable to extreme climate impacts using a risk index (0-100).",
-      "Reversal Risk SSP245": "Shows carbon reversal risk under a moderate-emissions scenario (SSP2-4.5), indicating areas with varying vulnerability to carbon loss due to climate disturbances, measured on a risk index (0-100)."
+      "Global Buffer Pool": "Provides the estimated buffer pool contribution (tCO2e/Ha) required to compensate for carbon losses in forests over 100 years, based on aggregated disturbance risks across three different disturbance severity scenarios.",
+      "Global Reversal Probability": "Shows carbon reversal probability under a moderate-emissions scenario (SSP2-4.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
+      "Buffer Pool": "Provides the estimated buffer pool contribution (tCO2e/Ha) required to compensate for carbon losses in forests over 100 years, based on aggregated disturbance risks.",
+      "Reversal Probability SSP245": "Shows carbon reversal probability under a moderate-emissions scenario (SSP2-4.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
+      "Reversal Probability SSP370": "Shows carbon reversal probability under a high-emissions scenario (SSP3-7.0) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
+      "Reversal Probability SSP585": "Shows carbon reversal probability under a very high-emissions scenario (SSP5-8.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100)."
     };
   
     return descriptions[title] || "Detailed information about this layer's characteristics and metrics. Click the layer buttons to visualize different aspects of the data.";
