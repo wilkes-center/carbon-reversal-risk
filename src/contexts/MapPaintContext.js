@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import { debounce } from 'lodash';
+import { debounce } from '../utils/debounce';
 import { logger } from '../utils/logger';
 
 const initialState = {

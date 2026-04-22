@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Source, Layer, useMap } from 'react-map-gl';
+import { Source, Layer, useMap } from 'react-map-gl/mapbox';
 
 const CongressionalDistrictsLayer = ({
   isDarkMode,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Map } from 'react-map-gl';
+import { Map } from 'react-map-gl/mapbox';
 import { MAPBOX_TOKEN } from '../../constants';
 import { basemaps } from '../../utils/map/basemaps';
 const MiniMap = ({ mainViewport }) => {

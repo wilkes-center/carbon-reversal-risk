@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { generatePaintProperty } from '../../utils/colors/colorScales';
-import { debounce } from 'lodash';
+import { debounce } from '../../utils/debounce';
 import { logger } from '../../utils/logger';
 
 const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) => {

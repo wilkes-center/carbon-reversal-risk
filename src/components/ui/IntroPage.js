@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Info, Clock, Github, MessageSquare, Globe } from 'lucide-react';
+import { Info, Clock, ExternalLink, MessageSquare, Globe } from 'lucide-react';
 
 /**
  * Introduction page for the Carbon Reversal Risk Tool
@@ -79,7 +79,7 @@ const IntroPage = ({ onComplete }) => {
             please submit a GitHub issue on our repository.
           </p>
           <div className="mt-3 flex items-center">
-            <Github size={16} className="mr-2 text-obsidian" />
+            <ExternalLink size={16} className="mr-2 text-obsidian" />
             <a href="https://github.com/wilkes-center/carbon-webapp/issues" 
                className="font-sans text-sm font-medium text-blue hover:text-blue/80">
               Submit issues on GitHub

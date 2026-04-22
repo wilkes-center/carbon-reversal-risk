@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { useMap } from 'react-map-gl';
+import { useMap } from 'react-map-gl/mapbox';
 import { Lasso, X } from 'lucide-react';
 import * as turf from '@turf/turf';
 import { logger } from '../../utils/logger';
