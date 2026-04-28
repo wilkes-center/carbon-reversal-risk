@@ -10,13 +10,17 @@ This directory contains static assets used throughout the application.
 
 ## Usage
 
-Assets can be imported directly in components:
+Assets can be imported directly in components. In Next.js, image imports return a `StaticImageData` object `{ src, width, height, blurDataURL }`, so use `.src` with a plain `<img>` tag, or pass the whole object to `next/image`:
 
 ```jsx
 import usaIcon from '../../assets/usa.png';
 
-// Using in a component
-<img src={usaIcon} alt="USA" />
+// Plain <img> tag:
+<img src={usaIcon.src} alt="USA" />
+
+// Or with next/image:
+import Image from 'next/image';
+<Image src={usaIcon} alt="USA" />
 ```
 
 ## Best Practices

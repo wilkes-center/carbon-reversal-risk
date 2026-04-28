@@ -1,6 +1,44 @@
+# OS / editor cruft
 .DS_Store
-node_modules/
-dist/
-.env
-*.logIcon?
+Thumbs.db
 Icon
+Icon?
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Build output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env*.local
+
+# npm / yarn artifacts (project uses pnpm)
+package-lock.json
+yarn.lock
+
+# Coverage / test
+coverage/
+
+# Vendor tooling
+.codex
+.turbo
+.vercel
