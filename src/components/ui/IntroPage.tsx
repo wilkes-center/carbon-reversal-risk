@@ -1,25 +1,24 @@
 // @ts-nocheck
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Info, Clock, ExternalLink, MessageSquare, Globe } from 'lucide-react';
 
 /**
  * Introduction page for the Carbon Reversal Risk Tool
  */
 const IntroPage = ({ onComplete }) => {
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.async = true;
-    script.dataset.goatcounter = 'https://wilkes-carbon.goatcounter.com/count';
-    script.src = '//gc.zgo.at/count.js';
-    
-    document.head.appendChild(script);
-    
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, []);
+  // GoatCounter — disabled for now
+  // useEffect(() => {
+  //   const script = document.createElement('script');
+  //   script.async = true;
+  //   script.dataset.goatcounter = 'https://wilkes-carbon.goatcounter.com/count';
+  //   script.src = '//gc.zgo.at/count.js';
+  //   document.head.appendChild(script);
+  //   return () => {
+  //     if (document.head.contains(script)) {
+  //       document.head.removeChild(script);
+  //     }
+  //   };
+  // }, []);
 
   return (
     <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
