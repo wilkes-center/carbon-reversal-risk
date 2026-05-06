@@ -48,8 +48,32 @@ const IntroPage = ({ onComplete }) => {
               About This Tool
             </h2>
             <p className="font-sans text-obsidian mt-3">
-              This interactive tool analyzes carbon reversal risk across different regions and buffer pool capacities. 
-              It allows you to explore risk scenarios and understand carbon storage vulnerabilities in various ecosystems.
+              This interactive tool analyzes carbon reversal risk across different regions and buffer pool capacities.
+              It allows you to explore risk scenarios and understand ecosystem carbon storage vulnerabilities in various ecosystems.
+              For full description of the methods and data, please see Wu et al. 2026 (
+              <a
+                href="https://doi.org/10.1038/s41586-026-10571-y"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue hover:text-blue/80 underline"
+              >
+                https://doi.org/10.1038/s41586-026-10571-y
+              </a>
+              ). For questions, please contact Chao Wu (
+              <a
+                href="mailto:chao-wu@tsinghua.edu.cn"
+                className="text-blue hover:text-blue/80 underline"
+              >
+                chao-wu@tsinghua.edu.cn
+              </a>
+              ) and William Anderegg (
+              <a
+                href="mailto:anderegg@utah.edu"
+                className="text-blue hover:text-blue/80 underline"
+              >
+                anderegg@utah.edu
+              </a>
+              ).
             </p>
           </div>
           
