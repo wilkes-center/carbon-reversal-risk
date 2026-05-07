@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import * as turf from '@turf/turf';
 import { logger } from '../../utils/logger';
-import { MAX_COMPOSITE_PARTS } from '../../utils/map/layers';
+import { getValueProperty } from '../../config/mapboxLayers';
 
 const AreaStats = ({ 
   uploadedFeatures, 
@@ -19,13 +19,7 @@ const AreaStats = ({
   const [isCalculating, setIsCalculating] = useState(false);
   const [dataSource] = useState('');
 
-  const valueKey = useMemo(() => {
-    if (!activeLayer) return 'raster_value';
-    if (activeLayer.includes('DroughtRisk')) return 'drought_risk';
-    if (activeLayer.includes('InsectRisk')) return 'insect_risk';
-    if (activeLayer.includes('FireRisk')) return 'fire_risk';
-    return 'raster_value';
-  }, [activeLayer]);
+  const valueKey = useMemo(() => getValueProperty(activeLayer), [activeLayer]);
 
   const safePolygon = useMemo(() => {
     try {
@@ -56,65 +50,43 @@ const AreaStats = ({
     setIsCalculating(true);
     
     try {
-      const layerIds = [activeLayer];
-      if (activeLayer.startsWith('composite')) {
-        for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-          const compositeId = `${activeLayer}_${i}`;
-          if (map.getLayer(compositeId)) {
-            layerIds.push(compositeId);
-          }
-        }
-      }
-  
       const allFeatures = [];
       const processedCoords = new Set();
 
-      const isCongressionalDistrict = uploadedFeatures?.[0]?.properties?.NAMELSAD20;
-      
-      for (const layerId of layerIds) {
-        let features;
+      const features = map.queryRenderedFeatures(undefined, {
+        layers: [activeLayer],
+      });
 
-        features = map.queryRenderedFeatures(undefined, {
-          layers: [layerId]
-        });
-  
-        features.forEach(feature => {
-          try {
-            if (!feature.geometry || !feature.properties) return;
-            const bounds = turf.bbox(feature);
-            const centerLon = (bounds[0] + bounds[2]) / 2;
-            const centerLat = (bounds[1] + bounds[3]) / 2;
-            const coordKey = `${centerLon.toFixed(4)},${centerLat.toFixed(4)}`;
-  
-            if (processedCoords.has(coordKey)) return;
-  
-            const centerPoint = turf.point([centerLon, centerLat]);
-  
-            if (turf.booleanPointInPolygon(centerPoint, safePolygon)) {
-              const value = feature.properties[valueKey];
-              const isReversalRiskLayer = activeLayer && activeLayer.includes('RiskSSP');
-              
-              // Include 0 values for reversal risk layers, exclude for others
-              const shouldInclude = typeof value === 'number' && !isNaN(value) && 
-                (isReversalRiskLayer ? value >= 0 : value > 0);
-              
-              if (shouldInclude) {
-                allFeatures.push({
-                  value,
-                  coordKey,
-                  longitude: centerLon,
-                  latitude: centerLat,
-                  properties: feature.properties,
-                  region: feature.properties.region
-                });
-                processedCoords.add(coordKey);
-              }
+      features.forEach(feature => {
+        try {
+          if (!feature.geometry || !feature.properties) return;
+          const bounds = turf.bbox(feature);
+          const centerLon = (bounds[0] + bounds[2]) / 2;
+          const centerLat = (bounds[1] + bounds[3]) / 2;
+          const coordKey = `${centerLon.toFixed(4)},${centerLat.toFixed(4)}`;
+
+          if (processedCoords.has(coordKey)) return;
+
+          const centerPoint = turf.point([centerLon, centerLat]);
+
+          if (turf.booleanPointInPolygon(centerPoint, safePolygon)) {
+            const value = feature.properties[valueKey];
+            if (typeof value === 'number' && !isNaN(value) && value >= 0) {
+              allFeatures.push({
+                value,
+                coordKey,
+                longitude: centerLon,
+                latitude: centerLat,
+                properties: feature.properties,
+                region: feature.properties.region,
+              });
+              processedCoords.add(coordKey);
             }
-          } catch (error) {
-            logger.warn('Error processing feature:', error);
           }
-        });
-      }
+        } catch (error) {
+          logger.warn('Error processing feature:', error);
+        }
+      });
   
       logger.log(`Found ${allFeatures.length} features in the selected area`);
       

@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { logger } from '../utils/logger';
-import { MAX_COMPOSITE_PARTS } from '../utils/map/layers';
 
 const initialState = {
   paintProperties: {},
@@ -59,18 +58,7 @@ export function MapPaintProvider({ children, map }) {
 
       try {
         const opacity = state.layerOpacities[layerId] ?? 0.8;
-        
         map.setPaintProperty(layerId, 'fill-opacity', opacity);
-
-        // Handle composite layers (updated to 65 parts)
-        if (layerId.startsWith('composite')) {
-          for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-            const compositeId = `${layerId}_${i}`;
-            if (map.getLayer(compositeId)) {
-              map.setPaintProperty(compositeId, 'fill-opacity', opacity);
-            }
-          }
-        }
       } catch (error) {
         logger.warn(`Error applying opacity to ${layerId}:`, error);
       }

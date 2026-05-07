@@ -2,14 +2,9 @@
 import mapboxgl from 'mapbox-gl';
 import * as turf from '@turf/turf';
 import { logger } from '../logger';
-import { MAX_COMPOSITE_PARTS } from './layers';
+import { getValueProperty } from '../../config/mapboxLayers';
 
-const getFeatureValueKey = (layerId) => {
-  if (layerId.includes('DroughtRisk')) return 'drought_risk';
-  if (layerId.includes('InsectRisk')) return 'insect_risk';
-  if (layerId.includes('FireRisk')) return 'fire_risk';
-  return 'raster_value';
-};
+const getFeatureValueKey = (layerId) => getValueProperty(layerId);
 
 const calculateCircleProperties = (feature) => {
   try {
@@ -125,18 +120,7 @@ export const downloadLayerDataAsCSV = (layerId, map, bounds, drawnFeatures = [])
       }
     };
 
-    // Query main layer
     features = features.concat(queryFeatures(layerId));
-
-    // Query composite layers if applicable
-    if (layerId.startsWith('composite')) {
-      for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-        const compositeId = `${layerId}_${i}`;
-        if (map.getLayer(compositeId)) {
-          features = features.concat(queryFeatures(compositeId));
-        }
-      }
-    }
 
     // Filter features based on drawn area
     if (filterArea) {

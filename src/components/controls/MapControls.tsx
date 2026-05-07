@@ -3,7 +3,6 @@ import React, { useCallback } from 'react';
 import { Layers, ZoomIn, ZoomOut, Compass, Trash2, Moon, Sun } from 'lucide-react';
 import MapViewToggle from './MapViewToggle';
 import { logger } from '../../utils/logger';
-import { MAX_COMPOSITE_PARTS } from '../../utils/map/layers';
 
 const MapControls = ({ 
   view,
@@ -18,37 +17,19 @@ const MapControls = ({
   mapRef,
   activeLayer 
 }) => {
-  // Safe way to handle layer operations
   const safeLayerOperation = useCallback((map, operation) => {
     if (!map || !activeLayer) return;
 
-    const layers = [activeLayer];
-    if (activeLayer.startsWith('composite')) {
-      for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-        const compositeId = `${activeLayer}_${i}`;
-        if (map.getLayer(compositeId)) {
-          layers.push(compositeId);
-        }
-      }
+    if (map.getLayer(activeLayer)) {
+      map.setLayoutProperty(activeLayer, 'visibility', 'none');
     }
 
-    // Hide layers before operation
-    layers.forEach(layerId => {
-      if (map.getLayer(layerId)) {
-        map.setLayoutProperty(layerId, 'visibility', 'none');
-      }
-    });
-
-    // Perform operation
     operation(map);
 
-    // Show layers after a brief delay
     setTimeout(() => {
-      layers.forEach(layerId => {
-        if (map.getLayer(layerId)) {
-          map.setLayoutProperty(layerId, 'visibility', 'visible');
-        }
-      });
+      if (map.getLayer(activeLayer)) {
+        map.setLayoutProperty(activeLayer, 'visibility', 'visible');
+      }
     }, 50);
   }, [activeLayer]);
 

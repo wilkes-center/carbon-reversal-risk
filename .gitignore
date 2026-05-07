@@ -42,3 +42,8 @@ coverage/
 .codex
 .turbo
 .vercel
+
+# Mapbox pipeline build artifacts
+scripts/mapbox/.build/
+scripts/mapbox/.venv/
+scripts/mapbox/__pycache__/

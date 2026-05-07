@@ -1,0 +1,18 @@
+[project]
+name = "carbon-reversal-risk-mapbox"
+version = "0.1.0"
+description = "Upload pipeline and account-wipe utility for the Carbon Reversal Risk app's Mapbox tilesets."
+requires-python = ">=3.11"
+dependencies = [
+    "mapbox-tilesets>=1.13.0",
+    "rasterio>=1.4.0",
+    "fiona>=1.10.0",
+    "shapely>=2.0.0",
+    "pyproj>=3.6.0",
+    "python-dotenv>=1.0.0",
+    "tqdm>=4.66.0",
+    "httpx>=0.28.0",
+]
+
+[tool.uv]
+package = false

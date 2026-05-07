@@ -1,16 +1,15 @@
 // @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { generatePaintProperty } from '../../utils/colors/colorScales';
+import { getValueProperty } from '../../config/mapboxLayers';
 import { debounce } from '../../utils/debounce';
 import { logger } from '../../utils/logger';
-import { MAX_COMPOSITE_PARTS } from '../../utils/map/layers';
 
 const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) => {
   const isUpdatingRef = useRef(false);
   const pendingUpdatesRef = useRef(new Map());
   const frameRequestRef = useRef(null);
 
-  // Create a debounced function to batch paint updates
   const batchUpdateStyles = useCallback(
     debounce(() => {
       if (!map || isUpdatingRef.current) return;
@@ -20,19 +19,16 @@ const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) 
         const updates = Array.from(pendingUpdatesRef.current.entries());
         pendingUpdatesRef.current.clear();
 
-        // Process all updates in a single animation frame
         cancelAnimationFrame(frameRequestRef.current);
         frameRequestRef.current = requestAnimationFrame(() => {
           updates.forEach(([layerId, paint]) => {
             if (map.getLayer(layerId)) {
-              // Apply all paint properties at once
               Object.entries(paint).forEach(([property, value]) => {
                 map.setPaintProperty(layerId, property, value);
               });
             }
           });
 
-          // Single repaint after all updates
           map.triggerRepaint();
           isUpdatingRef.current = false;
         });
@@ -41,58 +37,48 @@ const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) 
         isUpdatingRef.current = false;
       }
     }, 50),
-    [map]
+    [map],
   );
 
-  const updateLayerStyle = useCallback((layerId) => {
-    if (!map?.getLayer(layerId)) return;
+  const updateLayerStyle = useCallback(
+    (layerId) => {
+      if (!map?.getLayer(layerId)) return;
 
-    try {
-      // Get saved legend state if it exists
-      const savedLegendState = legendStateManager?.getLegendState(activeLayer);
-      
-      // Generate paint properties
-      const paint = savedLegendState ? {
-        'fill-color': [
-          'interpolate',
-          ['linear'],
-          ['coalesce', ['get', 'raster_value'], 0],
-          ...savedLegendState.flatMap(range => [range.value, range.color])
-        ],
-        'fill-opacity': 0.7,
-        'fill-outline-color': 'rgba(0,0,0,0)'
-      } : generatePaintProperty(layerId, isDarkMode);
+      try {
+        const savedLegendState = legendStateManager?.getLegendState(activeLayer);
+        const valueKey = getValueProperty(layerId);
 
-      // Queue the update
-      pendingUpdatesRef.current.set(layerId, paint);
+        const paint = savedLegendState
+          ? {
+              'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['coalesce', ['get', valueKey], 0],
+                ...savedLegendState.flatMap((range) => [range.value, range.color]),
+              ],
+              'fill-opacity': 0.7,
+              'fill-outline-color': 'rgba(0,0,0,0)',
+            }
+          : generatePaintProperty(layerId, isDarkMode);
 
-      // Handle composite layers
-      if (layerId.startsWith('composite')) {
-        for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-          const compositeId = `${layerId}_${i}`;
-          if (map.getLayer(compositeId)) {
-            pendingUpdatesRef.current.set(compositeId, paint);
-          }
-        }
+        pendingUpdatesRef.current.set(layerId, paint);
+        batchUpdateStyles();
+      } catch (error) {
+        logger.warn(`Error queueing style update for ${layerId}:`, error);
       }
+    },
+    [map, activeLayer, isDarkMode, legendStateManager, batchUpdateStyles],
+  );
 
-      // Trigger batch update
-      batchUpdateStyles();
-
-    } catch (error) {
-      logger.warn(`Error queueing style update for ${layerId}:`, error);
-    }
-  }, [map, activeLayer, isDarkMode, legendStateManager, batchUpdateStyles]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      batchUpdateStyles.cancel();
+  useEffect(
+    () => () => {
+      batchUpdateStyles.cancel?.();
       cancelAnimationFrame(frameRequestRef.current);
       pendingUpdatesRef.current.clear();
       isUpdatingRef.current = false;
-    };
-  }, [batchUpdateStyles]);
+    },
+    [batchUpdateStyles],
+  );
 
   return { updateLayerStyle };
 };

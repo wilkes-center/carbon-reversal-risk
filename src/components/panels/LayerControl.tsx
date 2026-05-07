@@ -1,12 +1,13 @@
 // @ts-nocheck
 // components/controls/LayerControl.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useMapPaint } from '../../contexts/MapPaintContext';
+import { showGlobalLayers } from '../../config/mapboxLayers';
 
 import { SectionHeader, LoadingOverlay } from '../controls/PanelUIComponents';
 import { LayerGroup, ReferenceLayers, UploadSection, DrawControls } from '../controls/LayerSections';
 
-const LayerControl = ({ 
+const LayerControl = ({
   activeLayer,
   toggleLayer,
   isDarkMode,
@@ -32,13 +33,14 @@ const LayerControl = ({
   mapRef,
   isCongressionalDistrictsVisible,
   toggleCongressionalDistricts,
-  setUploadStatus
+  setUploadStatus,
 }) => {
+  const globalEnabled = useMemo(() => showGlobalLayers(), []);
   const [expandedSections, setExpandedSections] = useState({
     global: true,
     us: true,
     reference: true,
-    uploaded: true
+    uploaded: true,
   });
   const { updateOpacity, getLayerOpacity } = useMapPaint();
   const [showDrawOptions, setShowDrawOptions] = useState(false);
@@ -47,7 +49,7 @@ const LayerControl = ({
   useEffect(() => {
     if (uploadedLayers.length > 0) {
       const newOpacities = {};
-      uploadedLayers.forEach(layer => {
+      uploadedLayers.forEach((layer) => {
         newOpacities[layer.id] = getLayerOpacity(layer.id);
       });
       setLayerOpacities(newOpacities);
@@ -56,10 +58,10 @@ const LayerControl = ({
 
   const handleUploadedOpacityChange = (layerId, value) => {
     if (!mapRef?.current) return;
-    
+
     const map = mapRef.current.getMap();
     const newOpacity = parseFloat(value);
-    
+
     if (!isNaN(newOpacity)) {
       updateUploadedLayerOpacity(layerId, newOpacity);
       map.triggerRepaint();
@@ -68,18 +70,34 @@ const LayerControl = ({
 
   const handleDeleteLayer = (layerId, e) => {
     e.stopPropagation();
-    setUploadedLayers(prevLayers => prevLayers.filter(layer => layer.id !== layerId));
+    setUploadedLayers((prevLayers) => prevLayers.filter((layer) => layer.id !== layerId));
     if (activeUploadedLayers.includes(layerId)) {
       toggleUploadedLayer(layerId);
     }
   };
 
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev[section]
+      [section]: !prev[section],
     }));
   };
+
+  const usGroupKeys = useMemo(
+    () =>
+      Object.values(layerGroups)
+        .filter((g) => g.scope === 'us')
+        .map((g) => g.key),
+    [layerGroups],
+  );
+
+  const globalGroupKeys = useMemo(
+    () =>
+      Object.values(layerGroups)
+        .filter((g) => g.scope === 'global')
+        .map((g) => g.key),
+    [layerGroups],
+  );
 
   return (
     <div className={`h-full flex flex-col shadow-lg ${
@@ -92,69 +110,68 @@ const LayerControl = ({
         <div className={`divide-y ${
           isDarkMode ? 'divide-gray-800' : 'divide-gray-100'
         }`}>
-          {/* Global Section */}
-          <section>
-            <SectionHeader
-              title="Global Layers"
-              isExpanded={expandedSections.global}
-              onClick={() => toggleSection('global')}
-              isDarkMode={isDarkMode}
-            />
+          {/* Global Section (auto-hidden when there are no global layers
+              configured OR when NEXT_PUBLIC_HIDE_GLOBAL_LAYERS=true). */}
+          {globalEnabled && globalGroupKeys.length > 0 && (
+            <section>
+              <SectionHeader
+                title="Global Layers"
+                isExpanded={expandedSections.global}
+                onClick={() => toggleSection('global')}
+                isDarkMode={isDarkMode}
+              />
 
-            {expandedSections.global && (
-              <div className="p-4 space-y-4">
-                <LayerGroup
-                  title="Global Buffer Pool"
-                  variants={layerGroups.globalBufferPool.variants}
-                  groupId={layerGroups.globalBufferPool}
-                  activeLayer={activeLayer}
-                  onToggle={toggleLayer}
-                  isDarkMode={isDarkMode}
-                />
-
-                <LayerGroup
-                  title="Global Reversal Probability"
-                  variants={layerGroups.globalReversal.variants}
-                  groupId={layerGroups.globalReversal}
-                  activeLayer={activeLayer}
-                  onToggle={toggleLayer}
-                  isDarkMode={isDarkMode}
-                />
-              </div>
-            )}
-          </section>
-
-          {/* US Section */}
-          <section>
-            <SectionHeader
-              title="US Layers"
-              isExpanded={expandedSections.us}
-              onClick={() => toggleSection('us')}
-              isDarkMode={isDarkMode}
-            />
-
-            {expandedSections.us && (
-              <div className="p-4 space-y-4">
-                {['bufferPool', 'reversalRiskSSP245', 'reversalRiskSSP370', 'reversalRiskSSP585'].map((groupId, index) => (
-                  <div key={groupId}>
+              {expandedSections.global && (
+                <div className="p-4 space-y-4">
+                  {globalGroupKeys.map((groupKey) => (
                     <LayerGroup
-                      title={layerGroups[groupId].name}
-                      variants={layerGroups[groupId].variants}
-                      groupId={layerGroups[groupId]}
+                      key={groupKey}
+                      title={layerGroups[groupKey].name}
+                      group={layerGroups[groupKey]}
                       activeLayer={activeLayer}
                       onToggle={toggleLayer}
                       isDarkMode={isDarkMode}
                     />
-                    {index === 0 && (
-                      <div className={`my-4 h-0.5 ${
-                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-                      }`} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* US Section */}
+          {usGroupKeys.length > 0 && (
+            <section>
+              <SectionHeader
+                title="US Layers"
+                isExpanded={expandedSections.us}
+                onClick={() => toggleSection('us')}
+                isDarkMode={isDarkMode}
+              />
+
+              {expandedSections.us && (
+                <div className="p-4 space-y-4">
+                  {usGroupKeys.map((groupKey, index) => (
+                    <div key={groupKey}>
+                      <LayerGroup
+                        title={layerGroups[groupKey].name}
+                        group={layerGroups[groupKey]}
+                        activeLayer={activeLayer}
+                        onToggle={toggleLayer}
+                        isDarkMode={isDarkMode}
+                      />
+                      {index === 0 && usGroupKeys.length > 1 && (
+                        <div
+                          className={`my-4 h-0.5 ${
+                            isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                          }`}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Reference Layers Section */}
           <section>
@@ -166,7 +183,7 @@ const LayerControl = ({
             />
 
             {expandedSections.reference && (
-              <ReferenceLayers 
+              <ReferenceLayers
                 isCongressionalDistrictsVisible={isCongressionalDistrictsVisible}
                 toggleCongressionalDistricts={toggleCongressionalDistricts}
               />

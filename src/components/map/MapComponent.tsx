@@ -2,9 +2,13 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Source, Layer, Popup, ScaleControl, Map } from 'react-map-gl/mapbox';
 import mapboxgl from 'mapbox-gl';
-import { layers, MAX_COMPOSITE_PARTS } from '../../utils/map/layers';
+import { layers } from '../../utils/map/layers';
+import {
+  LAYER_GROUPS,
+  getValueProperty,
+  userFriendlyLayerName,
+} from '../../config/mapboxLayers';
 import { basemaps } from '../../utils/map/basemaps';
-import { formatLayerName } from '../../utils/format/formatUtils';
 import { MAPBOX_TOKEN } from '../../config/env';
 import SearchBar from '../controls/SearchBar';
 import LayerControl from '../panels/LayerControl';
@@ -138,28 +142,12 @@ const MapComponent = () => {
 
     updateTimeoutRef.current = setTimeout(() => {
         if (map.getLayer(layerId)) {
-            // Define the updates array here from the paint object
             const updates = Object.entries(paint);
             requestAnimationFrame(() => {
                 updates.forEach(([property, value]) => {
                     map.setPaintProperty(layerId, property, value);
                 });
             });
-        }
-
-        // Handle composite layers
-        if (layerId.startsWith('composite')) {
-            for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-                const compositeId = `${layerId}_${i}`;
-                if (map.getLayer(compositeId)) {
-                    const updates = Object.entries(paint); // Define updates again for composite layers
-                    requestAnimationFrame(() => {
-                        updates.forEach(([property, value]) => {
-                            map.setPaintProperty(compositeId, property, value);
-                        });
-                    });
-                }
-            }
         }
     }, 50);
 }, []);
@@ -214,11 +202,9 @@ const MapComponent = () => {
 
 
   const toggleDarkMode = useCallback(() => {
-    // Clear all layers first
     if (mapRef.current) {
         const map = mapRef.current.getMap();
-        
-        // Clear active layer and its composite parts if they exist
+
         if (activeLayer) {
             if (map.getLayer(activeLayer)) {
                 map.removeLayer(activeLayer);
@@ -226,34 +212,16 @@ const MapComponent = () => {
             if (map.getSource(activeLayer)) {
                 map.removeSource(activeLayer);
             }
-            
-            // Clear composite layers
-            if (activeLayer.startsWith('composite')) {
-                for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-                    const compositeId = `${activeLayer}_${i}`;
-                    if (map.getLayer(compositeId)) {
-                        map.removeLayer(compositeId);
-                    }
-                    if (map.getSource(compositeId)) {
-                        map.removeSource(compositeId);
-                    }
-                }
-            }
         }
     }
-    
-    // Clear active layer state and custom legend colors
+
     setActiveLayer(null);
-    setCustomLegendColors({});  // Clear all custom colors
-    legendStateManager.clearAll();  // Clear saved legend states
-    
-    // Toggle dark mode
+    setCustomLegendColors({});
+    legendStateManager.clearAll();
+
     setIsDarkMode(prev => !prev);
-    
-    // Change basemap
     setActiveBasemap(isDarkMode ? 'light' : 'dark');
-    
-    // Force map repaint after a short delay
+
     setTimeout(() => {
         if (mapRef.current) {
             const map = mapRef.current.getMap();
@@ -277,70 +245,7 @@ const MapComponent = () => {
 
 
   
-  const layerGroups = useMemo(() => ({
-    combinedRisk: {
-      name: 'Combined Risk Absolute Reversal',
-      variants: ['ssp245', 'ssp585'],
-      layers: {
-        ssp245: 'CombinedRisk_ssp245',
-        ssp585: 'CombinedRisk_ssp585'
-      }
-    },
-    bufferPool: {
-      name: 'Buffer Pool',
-      variants: ['Insect', 'Drought', 'Fire'],
-      layers: {
-        Insect: 'InsectBufferPool',
-        Drought: 'DroughtBufferPool',
-        Fire: 'FireBufferPool'
-      }
-    },
-    globalBufferPool: {
-      name: 'Global Buffer Pool',
-      variants: ['low','moderate','high'],
-      layers: {
-        low: 'compositeGbfLowSsp245',
-        moderate: 'compositeGbfModerateSsp245',
-        high: 'compositeGbfHighSsp245'
-      }
-    },
-    globalReversal: {
-      name: 'Global Reversal Probability',
-      variants: ['low', 'moderate', 'high'],
-      layers: {
-        low: 'compositeGrLowSsp245',
-        moderate: 'compositeGrModerateSsp245',
-        high: 'compositeGrHighSsp245'
-      }
-    },
-    reversalRiskSSP585: {
-      name: 'Reversal Probability SSP585',
-      variants: ['Insect', 'Drought', 'Fire'],
-      layers: {
-        Insect: 'InsectRiskSSP585',
-        Drought: 'DroughtRiskSSP585',
-        Fire: 'FireRiskSSP585'
-      }
-    },
-    reversalRiskSSP245: {
-      name: 'Reversal Probability SSP245',
-      variants: ['Insect', 'Drought', 'Fire'],
-      layers: {
-        Insect: 'InsectRiskSSP245',
-        Drought: 'DroughtRiskSSP245',
-        Fire: 'FireRiskSSP245'
-      }
-    },
-    reversalRiskSSP370: {
-      name: 'Reversal Probability SSP370',
-      variants: ['Insect', 'Drought', 'Fire'],
-      layers: {
-        Insect: 'InsectRiskSSP370',
-        Drought: 'DroughtRiskSSP370',
-        Fire: 'FireRiskSSP370'
-      }
-    },
-  }), []);
+  const layerGroups = LAYER_GROUPS;
 
 
   const handleLayerUpdate = useCallback((layerId) => {
@@ -398,19 +303,11 @@ const MapComponent = () => {
   const handleLegendRangeChange = useCallback((layerId, newRanges) => {
     logger.log('Legend range change for:', layerId);
     logger.log('New ranges:', newRanges);
-    
+
     if (!mapRef.current) return;
     const map = mapRef.current.getMap();
 
-    // Get the correct value key based on layer type
-    const getValueKey = (id) => {
-        if (id.includes('DroughtRisk')) return 'drought_risk';
-        if (id.includes('InsectRisk')) return 'insect_risk';
-        if (id.includes('FireRisk')) return 'fire_risk';
-        return 'raster_value';
-    };
-    
-    const valueKey = getValueKey(layerId);
+    const valueKey = getValueProperty(layerId);
     logger.log('Using value key:', valueKey);
 
     const newColorScale = [
@@ -473,65 +370,25 @@ const handleMapClick = useCallback((event) => {
   }
 
   const features = map.queryRenderedFeatures(event.point);
-  
+  const valueKey = getValueProperty(activeLayer);
+
   const activeFeatures = features.filter(feature => {
     const layerId = feature.layer.id;
-    if (!(layerId === activeLayer || layerId.startsWith(`${activeLayer}_`))) {
-      return false;
-    }
-
-    // Get the appropriate value key based on layer type
-    let value;
-    if (layerId.includes('DroughtRisk')) {
-      value = feature.properties.drought_risk;
-    } else if (layerId.includes('InsectRisk')) {
-      value = feature.properties.insect_risk;
-    } else if (layerId.includes('FireRisk')) {
-      value = feature.properties.fire_risk;
-    } else {
-      value = feature.properties.raster_value;
-    }
-
-    // Include 0 values for buffer pool layers and reversal risk layers
-    return (layerId.includes('BufferPool') || layerId.includes('RiskSSP'))
-      ? value >= 0 
-      : value > 0;
+    if (layerId !== activeLayer) return false;
+    const value = feature.properties[valueKey];
+    return value !== undefined && value !== null && value >= 0;
   });
-  
+
   if (activeFeatures.length > 0) {
     const feature = activeFeatures[0];
-    let value;
-    if (feature.layer.id.includes('DroughtRisk')) {
-      value = feature.properties.drought_risk;
-    } else if (feature.layer.id.includes('InsectRisk')) {
-      value = feature.properties.insect_risk;
-    } else if (feature.layer.id.includes('FireRisk')) {
-      value = feature.properties.fire_risk;
-    } else {
-      value = feature.properties.raster_value;
-    }
-
-    // Get region information for reversal risk layers
-    const isReversalRiskLayer = feature.layer.id.includes('RiskSSP');
-    const region = isReversalRiskLayer ? feature.properties.region : null;
-
-    // Get user-friendly layer name from layerGroups
-    const getUserFriendlyLayerName = (layerId) => {
-      for (const group of Object.values(layerGroups)) {
-        for (const [variantKey, variantLayerId] of Object.entries(group.layers)) {
-          if (variantLayerId === layerId) {
-            return `${group.name} - ${variantKey.charAt(0).toUpperCase() + variantKey.slice(1)}`;
-          }
-        }
-      }
-      return formatLayerName(layerId);
-    };
+    const value = feature.properties[valueKey];
+    const region = feature.properties.region ?? null;
 
     setPopupInfo({
       lngLat: event.lngLat,
-      layerName: getUserFriendlyLayerName(activeLayer),
+      layerName: userFriendlyLayerName(activeLayer),
       value: value,
-      region: region
+      region: region,
     });
     setClickedFeature(feature);
     
@@ -575,15 +432,16 @@ const handleMapClick = useCallback((event) => {
   const removeOutlines = useCallback((layerId) => {
     if (!mapRef.current || !layerId) return;
     const map = mapRef.current.getMap();
-    
+
     try {
       if (!map.getLayer(layerId)) return;
-  
+
+      const valueKey = getValueProperty(layerId);
       const defaultPaint = {
         'fill-color': [
           'interpolate',
           ['linear'],
-          ['coalesce', ['get', 'raster_value'], 0],
+          ['coalesce', ['get', valueKey], 0],
           0, 'rgba(0,0,0,0)',
           100, 'rgba(0,0,0,0)'
         ],
@@ -615,24 +473,16 @@ const handleMapClick = useCallback((event) => {
   useEffect(() => {
     if (!mapRef.current) return;
     const map = mapRef.current.getMap();
-  
+
     const setupLayer = (layerId) => {
       return new Promise((resolve) => {
         if (!map.isStyleLoaded()) {
           map.once('style.load', () => setupLayer(layerId).then(resolve));
           return;
         }
-  
-        // Remove existing layer
+
         if (map.getLayer(layerId)) {
           map.removeLayer(layerId);
-        }
-  
-        // Add null checks for layers
-        if (!layers) {
-          logger.error('Layers array is undefined');
-          resolve();
-          return;
         }
 
         const layerConfig = layers.find(l => l.id === layerId);
@@ -641,115 +491,52 @@ const handleMapClick = useCallback((event) => {
           resolve();
           return;
         }
-  
-        // Ensure source exists
+
         if (!map.getSource(layerId)) {
           map.addSource(layerId, layerConfig.source);
         }
-  
-        // Add main layer with delay
+
         setTimeout(() => {
           const paint = generatePaintProperty(layerId, isDarkMode);
-          if (paint) {
-            map.addLayer({
-              id: layerId,
-              type: 'fill',
-              source: layerId,
-              'source-layer': layerConfig.layer['source-layer'],
-              paint: {
-                'fill-color': paint['fill-color'],
-                'fill-opacity': 0.7,  // Changed from 0 to 0.7
-                'fill-outline-color': 'rgba(0,0,0,0)',
-                'fill-outline-opacity': 0
-              },
-              layout: {
-                visibility: 'visible'
-              },
-              filter: layerId.includes('BufferPool') 
-          ? ['>=', ['get', 'raster_value'], 0]  // Include 0 for buffer pools
-          : layerId.includes('DroughtRisk')
-          ? ['>=', ['get', 'drought_risk'], 0]  // Include 0 for drought risk
-          : layerId.includes('InsectRisk')
-          ? ['>=', ['get', 'insect_risk'], 0]   // Include 0 for insect risk
-          : layerId.includes('FireRisk')
-          ? ['>=', ['get', 'fire_risk'], 0]     // Include 0 for fire risk
-          : ['>', ['get', 'raster_value'], 0]   // Exclude 0 for other layers
-        });
-            
-  
-            // Remove fade in since we're setting initial opacity to 0.7
-            if (layerId.startsWith('composite')) {
-              for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-                const compositeId = `${layerId}_${i}`;
-                const sourceLayer = layerConfig.layer['source-layer'].replace('_1_', `_${i}_`);
-                
-                if (map.getLayer(compositeId)) {
-                  map.removeLayer(compositeId);
-                }
-  
-                const compositeSourceId = `${layerId}_${i}`;
-                if (!map.getSource(compositeSourceId)) {
-                  map.addSource(compositeSourceId, {
-                    type: 'vector',
-                    url: `mapbox://pkulandh.${layerId.toLowerCase()}_part_${i}`
-                  });
-                }
-  
-                map.addLayer({
-                  id: compositeId,
-                  type: 'fill',
-                  source: compositeSourceId,
-                  'source-layer': sourceLayer,
-                  paint: {
-                    'fill-color': paint['fill-color'],
-                    'fill-opacity': 0.7,  // Changed from 0 to 0.7
-                    'fill-outline-color': 'rgba(0,0,0,0)',
-                    'fill-outline-opacity': 0
-                  },
-                  layout: {
-                    visibility: 'visible'
-                  }
-                });
-              }
-            }
-            resolve();
-          }
+          map.addLayer({
+            id: layerId,
+            type: 'fill',
+            source: layerId,
+            'source-layer': layerConfig.layer['source-layer'],
+            paint: {
+              'fill-color': paint['fill-color'],
+              'fill-opacity': 0.7,
+              'fill-outline-color': 'rgba(0,0,0,0)',
+              'fill-outline-opacity': 0,
+            },
+            layout: { visibility: 'visible' },
+            filter: layerConfig.layer.filter,
+          });
+          resolve();
         }, 100);
       });
     };
-  
-    // Only keep the style load handler
+
     const handleStyleLoad = () => {
       if (activeLayer) {
         setupLayer(activeLayer);
       }
     };
-  
-    // Add only style.load event listener
+
     map.on('style.load', handleStyleLoad);
-  
-    // Initial setup with a small delay
+
     if (map.isStyleLoaded() && activeLayer) {
       setTimeout(() => {
         setupLayer(activeLayer);
       }, 100);
     }
-  
-    // Cleanup
+
     return () => {
       map.off('style.load', handleStyleLoad);
-      
+
       if (map && map.isStyleLoaded() && activeLayer) {
         if (map.getLayer(activeLayer)) {
           map.removeLayer(activeLayer);
-        }
-        if (activeLayer.startsWith('composite')) {
-          for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-            const compositeId = `${activeLayer}_${i}`;
-            if (map.getLayer(compositeId)) {
-              map.removeLayer(compositeId);
-            }
-          }
         }
       }
     };
@@ -758,20 +545,11 @@ const handleMapClick = useCallback((event) => {
   const handleBoundsChange = useCallback((bounds) => {
     if (!mapRef.current) return;
     const map = mapRef.current.getMap();
-    
+
     try {
-      // Store current layer visibility states
       const layerStates = {};
       if (activeLayer) {
         layerStates[activeLayer] = map.getLayoutProperty(activeLayer, 'visibility');
-        if (activeLayer.startsWith('composite')) {
-          for (let i = 2; i <= MAX_COMPOSITE_PARTS; i++) {
-            const compositeId = `${activeLayer}_${i}`;
-            if (map.getLayer(compositeId)) {
-              layerStates[compositeId] = map.getLayoutProperty(compositeId, 'visibility');
-            }
-          }
-        }
       }
 
       // Fit to bounds
@@ -1376,7 +1154,6 @@ const getBoundsFromFeatures = (features) => {
         </>
       )}
 
-=
       </Map>
 
       {viewport.zoom > 5 && <MiniMap mainViewport={viewport} />}

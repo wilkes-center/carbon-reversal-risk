@@ -5,31 +5,9 @@ import { Download, X, Lasso, Circle } from 'lucide-react';
 import FileUploadControl from './FileUploadControl';
 import { LayerButton, truncateFilename } from './PanelUIComponents';
 import InfoTooltip from '../ui/InfoTooltip';
-import { logger } from '../../utils/logger';
 
 // Layer Group Component
-export const LayerGroup = ({ title, variants, groupId, activeLayer, onToggle, isDarkMode }) => {
-  // Find the key in the layerGroups object for this group
-  // For string groupId values, use them directly
-  // For object groupId values without an id, look at properties to determine what it is
-  const getGroupKey = () => {
-    if (typeof groupId === 'string') return groupId;
-    
-    // For objects like layerGroups.globalBufferPool
-    if (groupId.name === 'Global Buffer Pool') return 'globalBufferPool';
-    if (groupId.name === 'Global Reversal Probability') return 'globalReversal';
-    if (groupId.name === 'Buffer Pool') return 'bufferPool';
-    if (groupId.name === 'Reversal Probability SSP585') return 'reversalRiskSSP585';
-    if (groupId.name === 'Reversal Probability SSP370') return 'reversalRiskSSP370';
-    if (groupId.name === 'Reversal Probability SSP245') return 'reversalRiskSSP245';
-    if (groupId.name === 'Combined Risk Absolute Reversal') return 'combinedRisk';
-    
-    logger.error('Unknown layer group:', groupId);
-    return null;
-  };
-  
-  const groupKey = getGroupKey();
-  
+export const LayerGroup = ({ title, group, activeLayer, onToggle, isDarkMode }) => {
   return (
     <div className="space-y-2" role="group" aria-labelledby={`${title}-heading`}>
       <div className="flex items-center gap-2 mb-2">
@@ -38,24 +16,23 @@ export const LayerGroup = ({ title, variants, groupId, activeLayer, onToggle, is
         }`}>
           {title}
         </h3>
-        <InfoTooltip 
+        <InfoTooltip
           title={title}
           isDarkMode={isDarkMode}
         />
       </div>
-      
+
       <div className="grid grid-cols-3 gap-2">
-        {variants.map(variant => {
-          // Determine if this is an intensity-based variant
+        {group.variants.map(variant => {
           const isIntensity = ['low', 'moderate', 'high'].includes(variant.toLowerCase());
-          
+
           return (
             <LayerButton
               key={variant}
               variant={variant}
               intensity={isIntensity ? variant.toLowerCase() : null}
-              isActive={activeLayer === groupId.layers[variant]}
-              onClick={() => onToggle(groupKey, variant)}
+              isActive={activeLayer === group.layers[variant]}
+              onClick={() => onToggle(group.key, variant)}
               isDarkMode={isDarkMode}
             />
           );
