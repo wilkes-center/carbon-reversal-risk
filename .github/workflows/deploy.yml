@@ -26,13 +26,13 @@ jobs:
         run: corepack enable
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -43,13 +43,14 @@ jobs:
       - name: Build
         env:
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
+          NEXT_PUBLIC_HIDE_GLOBAL_LAYERS: ${{ vars.NEXT_PUBLIC_HIDE_GLOBAL_LAYERS }}
         run: pnpm build
 
       - name: Disable Jekyll processing
         run: touch ./out/.nojekyll
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./out
 
