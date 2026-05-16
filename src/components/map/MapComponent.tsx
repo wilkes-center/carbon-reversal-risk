@@ -42,9 +42,13 @@ const MapComponent = () => {
     minZoom: 0,
     maxZoom: 20
   }), []);
-  const { 
-    updateOpacity: updateUploadedLayerOpacity,
-    getLayerOpacity: getUploadedLayerOpacity 
+  const {
+    setLayerOpacity: updateUploadedLayerOpacity,
+    getLayerOpacity: getUploadedLayerOpacity,
+    buildPaint: buildUploadedLayerPaint,
+    getStyleConfig: getUploadedLayerStyleConfig,
+    setStyleConfig: setUploadedLayerStyleConfig,
+    resetStyleConfig: resetUploadedLayerStyleConfig,
   } = useUploadedLayerStyling();
   const [viewport, handleViewportChange] = useViewport(initialViewport);
   const [isBasemapOpen, setIsBasemapOpen] = useState(false);
@@ -77,18 +81,6 @@ const MapComponent = () => {
   const [districtFeaturesData, setDistrictFeaturesData] = useState([]);
 
   const updateTimeoutRef = useRef(null);
-
-  const LAYER_COLORS = [
-    '#1E88E5',  // Blue
-    '#28A745',  // Green
-    '#DC3545',  // Red
-    '#FFC107',  // Yellow
-    '#6F42C1',  // Purple
-    '#FD7E14'   // Orange
-  ];
-  
-
-
 
   const { updateLayerStyle } = useLayerStyleManager(
     mapRef.current?.getMap(),
@@ -729,7 +721,7 @@ const getBoundsFromFeatures = (features) => {
     return true;
   };
 
-  const handleFileUpload = useCallback((geoJSON, fileName) => {
+  const handleFileUpload = useCallback((geoJSON, fileName, schema = {}) => {
     try {
         if (!isValidGeoJSON(geoJSON)) {
             throw new Error('Invalid GeoJSON structure');
@@ -767,6 +759,8 @@ const getBoundsFromFeatures = (features) => {
             id: `uploaded-${Date.now()}`,
             name: fileName,
             data: { type: 'FeatureCollection', features: validFeatures },
+            schema,
+            geometryType: validFeatures[0]?.geometry?.type ?? 'Polygon',
         };
         setUploadedLayers(prevLayers => [...prevLayers, newLayer]);
         setActiveUploadedLayers(prevActive => [...prevActive, newLayer.id]);
@@ -918,6 +912,10 @@ const getBoundsFromFeatures = (features) => {
             getMapLayerOpacity={getMapLayerOpacity}
             updateUploadedLayerOpacity={updateUploadedLayerOpacity}
             getUploadedLayerOpacity={getUploadedLayerOpacity}
+            getUploadedLayerStyleConfig={getUploadedLayerStyleConfig}
+            setUploadedLayerStyleConfig={setUploadedLayerStyleConfig}
+            resetUploadedLayerStyleConfig={resetUploadedLayerStyleConfig}
+            buildUploadedLayerPaint={buildUploadedLayerPaint}
             isCongressionalDistrictsVisible={isCongressionalDistrictsVisible}
             toggleCongressionalDistricts={toggleCongressionalDistricts}
             setUploadStatus={setUploadStatus}
@@ -1011,36 +1009,38 @@ const getBoundsFromFeatures = (features) => {
             />
           </Source>
         )}
-          {uploadedLayers.map((layer, index) => (  // Added index parameter here
-              activeUploadedLayers.includes(layer.id) && (
-        <Source 
-            key={layer.id}
-            type="geojson" 
-            data={layer.data}
-        >
-            <Layer
+          {uploadedLayers.map((layer) => {
+            if (!activeUploadedLayers.includes(layer.id)) return null;
+            const geomType = layer.geometryType
+              ?? layer.data?.features?.[0]?.geometry?.type
+              ?? 'Polygon';
+            const built = buildUploadedLayerPaint(
+              layer.id,
+              geomType,
+              layer.data?.features,
+            );
+            return (
+              <Source
                 key={layer.id}
-                id={`${layer.id}`}
-                type="fill"
-                paint={{
-                    'fill-color': LAYER_COLORS[index % LAYER_COLORS.length],
-                    'fill-opacity': getUploadedLayerOpacity(layer.id),
-                    'fill-outline-color': LAYER_COLORS[index % LAYER_COLORS.length]
-                }}
-            />
-            <Layer
-                key={`${layer.id}-outline`}
-                id={`${layer.id}-outline`}
-                type="line"
-                paint={{
-                    'line-color': LAYER_COLORS[index % LAYER_COLORS.length],
-                    'line-opacity': getUploadedLayerOpacity(layer.id),
-                    'line-width': 1
-                }}
-            />
-        </Source>
-          )
-        ))}
+                id={layer.id}
+                type="geojson"
+                data={layer.data}
+              >
+                <Layer
+                  id={`${layer.id}`}
+                  type={built.type}
+                  paint={built.paint}
+                />
+                {built.outlinePaint && (
+                  <Layer
+                    id={`${layer.id}-outline`}
+                    type="line"
+                    paint={built.outlinePaint}
+                  />
+                )}
+              </Source>
+            );
+          })}
       {isDrawMode && (
           <button
             onClick={() => toggleDrawMode(null)}

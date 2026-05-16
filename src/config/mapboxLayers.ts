@@ -109,7 +109,7 @@ export const LAYER_ENTRIES: LayerEntry[] = [
   // ---------- US: Buffer Pool (per-driver, ssp245 only) ----------
   rasterEntry({
     group: 'bufferPool',
-    groupLabel: 'Buffer Pool',
+    groupLabel: 'Buffer Pool SSP245',
     scope: 'us',
     variant: 'Insect',
     tileset: 'bufferpool_insect_ssp245',
@@ -117,7 +117,7 @@ export const LAYER_ENTRIES: LayerEntry[] = [
   }),
   rasterEntry({
     group: 'bufferPool',
-    groupLabel: 'Buffer Pool',
+    groupLabel: 'Buffer Pool SSP245',
     scope: 'us',
     variant: 'Drought',
     tileset: 'bufferpool_drought_ssp245',
@@ -125,7 +125,7 @@ export const LAYER_ENTRIES: LayerEntry[] = [
   }),
   rasterEntry({
     group: 'bufferPool',
-    groupLabel: 'Buffer Pool',
+    groupLabel: 'Buffer Pool SSP245',
     scope: 'us',
     variant: 'Fire',
     tileset: 'bufferpool_fire_ssp245',

@@ -30,6 +30,10 @@ const LayerControl = ({
   legendStateManager,
   updateUploadedLayerOpacity,
   getUploadedLayerOpacity,
+  getUploadedLayerStyleConfig,
+  setUploadedLayerStyleConfig,
+  resetUploadedLayerStyleConfig,
+  buildUploadedLayerPaint,
   mapRef,
   isCongressionalDistrictsVisible,
   toggleCongressionalDistricts,
@@ -208,6 +212,10 @@ const LayerControl = ({
                 handleDeleteLayer={handleDeleteLayer}
                 getUploadedLayerOpacity={getUploadedLayerOpacity}
                 handleUploadedOpacityChange={handleUploadedOpacityChange}
+                getUploadedLayerStyleConfig={getUploadedLayerStyleConfig}
+                setUploadedLayerStyleConfig={setUploadedLayerStyleConfig}
+                resetUploadedLayerStyleConfig={resetUploadedLayerStyleConfig}
+                buildUploadedLayerPaint={buildUploadedLayerPaint}
                 setUploadStatus={setUploadStatus}
                 isDarkMode={isDarkMode}
               />

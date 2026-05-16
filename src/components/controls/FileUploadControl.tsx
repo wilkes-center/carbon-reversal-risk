@@ -5,6 +5,7 @@ import { Upload, Loader } from 'lucide-react';
 import JSZip from 'jszip';
 import { handleShapefile } from '../../utils/map/shapefileHandler';
 import { processGeoJSON } from '../../utils/map/coordinateReprojection';
+import { extractNumericAttributes } from '../../utils/colors/classify';
 import { logger } from '../../utils/logger';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
@@ -202,9 +203,11 @@ const FileUploadControl = ({ onFileUpload, setUploadStatus }) => {
         setUploadStatus('No valid features found in file');
         return;
       }
-  
+
+      const schema = extractNumericAttributes(geoJSON.features);
+
       setUploadStatus(`Successfully processed ${file.name} (${geoJSON.features.length} features)`);
-      onFileUpload(geoJSON, file.name);
+      onFileUpload(geoJSON, file.name, schema);
     } catch (error) {
       setUploadStatus(`Error: ${error.message}`);
       logger.error('File processing error:', error);
