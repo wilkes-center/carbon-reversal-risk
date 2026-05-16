@@ -4,6 +4,14 @@ import React from 'react';
 import { ChevronDown, ChevronUp, RefreshCw, X } from 'lucide-react';
 import InfoTooltip from '../ui/InfoTooltip';
 
+/** e.g. ssp245 → SSP245 (avoids title-casing that yields "Ssp245"). */
+function formatVariantLabel(variant) {
+  if (typeof variant !== 'string') return variant;
+  const ssp = variant.match(/^ssp(\d+)$/i);
+  if (ssp) return `SSP${ssp[1]}`;
+  return variant.charAt(0).toUpperCase() + variant.slice(1);
+}
+
 // Basic Button Component
 export const LayerButton = ({ isActive, onClick, variant, intensity = null, isDarkMode = false }) => {
   // Get color based on intensity if provided
@@ -35,7 +43,7 @@ export const LayerButton = ({ isActive, onClick, variant, intensity = null, isDa
         focus:outline-none focus:ring-1 focus:ring-green
       `}
     >
-      {typeof variant === 'string' ? variant.charAt(0).toUpperCase() + variant.slice(1) : variant}
+      {formatVariantLabel(variant)}
     </button>
   );
 };
