@@ -313,6 +313,24 @@ export const getValueProperty = (id: string | null | undefined): string => {
   return entry ? entry.valueProperty : 'value';
 };
 
+export interface SupersectionMetric {
+  key: string;
+  label: string;
+}
+
+export const SUPERSECTION_METRICS: readonly SupersectionMetric[] = [
+  { key: 'cmbrs__', label: 'Combined Risk Reversal' },
+  { key: 'cmbsm__', label: 'Combined Sum' },
+  { key: 'frtrs__', label: 'Fire Reversal' },
+  { key: 'drtrs__', label: 'Drought Reversal' },
+  { key: 'insrs__', label: 'Insect Reversal' },
+] as const;
+
+export const isSupersectionLayer = (id: string | null | undefined): boolean => {
+  const entry = getLayerEntry(id);
+  return !!entry && entry.sourceLayer.startsWith('allrisk_supersection_');
+};
+
 export const getColorScale = (id: string | null | undefined): ColorScale | null => {
   const entry = getLayerEntry(id);
   return entry ? entry.colorScale : null;

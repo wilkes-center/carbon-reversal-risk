@@ -56,8 +56,17 @@ class TilesetSpec:
         return self.tileset_id
 
 
-# Property names retained from the supersection .dbf
-SUPERSECTION_PROPS = ("frtrs__", "drtrs__", "insrs__", "cmbrs__", "cmbsm__")
+# Property names retained from the supersection .dbf.
+# `SSectin` carries the human-readable region name (e.g. "Okanogan Highland");
+# the pipeline renames it to `region` before it reaches the tiles.
+SUPERSECTION_PROPS = (
+    "SSectin",
+    "frtrs__",
+    "drtrs__",
+    "insrs__",
+    "cmbrs__",
+    "cmbsm__",
+)
 
 
 TILESETS: tuple[TilesetSpec, ...] = (

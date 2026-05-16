@@ -133,6 +133,8 @@ def convert_shapefile(spec: TilesetSpec, source_path: Path) -> Path:
                     ).items()
                     if not keep or k in keep
                 }
+                if "SSectin" in props:
+                    props["region"] = props.pop("SSectin")
                 _write_feature(handle, geom, props)
                 count += 1
     print(f"  -> {count:,} features written to {out.name}")

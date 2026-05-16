@@ -7,6 +7,8 @@ import {
   LAYER_GROUPS,
   getValueProperty,
   userFriendlyLayerName,
+  isSupersectionLayer,
+  SUPERSECTION_METRICS,
 } from '../../config/mapboxLayers';
 import { basemaps } from '../../utils/map/basemaps';
 import { MAPBOX_TOKEN } from '../../config/env';
@@ -375,12 +377,23 @@ const handleMapClick = useCallback((event) => {
     const feature = activeFeatures[0];
     const value = feature.properties[valueKey];
     const region = feature.properties.region ?? null;
+    const isSS = isSupersectionLayer(activeLayer);
 
     setPopupInfo({
       lngLat: event.lngLat,
       layerName: userFriendlyLayerName(activeLayer),
-      value: value,
       region: region,
+      metrics: isSS
+        ? SUPERSECTION_METRICS.map((m) => {
+            const raw = feature.properties[m.key];
+            return {
+              label: m.label,
+              value: raw == null || raw === '' ? null : Number(raw),
+              active: m.key === valueKey,
+            };
+          })
+        : null,
+      value: isSS ? null : value,
     });
     setClickedFeature(feature);
     
