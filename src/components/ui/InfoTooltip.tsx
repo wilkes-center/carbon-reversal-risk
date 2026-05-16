@@ -10,7 +10,9 @@ import { Info, X } from 'lucide-react';
       "Buffer Pool SSP245": "Provides the estimated buffer pool contribution (tCO2e/Ha) required to compensate for carbon losses in forests over 100 years, based on aggregated disturbance risks. Values correspond to the moderate-emissions climate scenario SSP245.",
       "Reversal Probability SSP245": "Shows carbon reversal probability under a moderate-emissions scenario (SSP2-4.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
       "Reversal Probability SSP370": "Shows carbon reversal probability under a high-emissions scenario (SSP3-7.0) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
-      "Reversal Probability SSP585": "Shows carbon reversal probability under a very high-emissions scenario (SSP5-8.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100)."
+      "Reversal Probability SSP585": "Shows carbon reversal probability under a very high-emissions scenario (SSP5-8.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
+      "Reference Layers": "Optional map overlays for orientation and context while you explore reversal and buffer-pool layers.",
+      "Upload New Layer": "Bring your own vector data on top of the built-in layers. You can upload GeoJSON (.geojson), KML, KMZ, or a zipped Esri shapefile (.zip); coordinates are reprojected to the map when needed. After upload, turn layers on or off, adjust opacity, remove files you no longer need, and optionally style polygons by a numeric property (equal interval or quantile classes, color ramp, and invert). Files are limited to 50 MB each.",
     };
   
     return descriptions[title] || "Detailed information about this layer's characteristics and metrics. Click the layer buttons to visualize different aspects of the data.";
