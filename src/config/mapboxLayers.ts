@@ -89,22 +89,22 @@ const rasterEntry = (config: {
 
 export const LAYER_ENTRIES: LayerEntry[] = [
   // ---------- US: Combined Risk Absolute Reversal (cmbrs__) ----------
-  supersectionEntry(
-    'ssp245',
-    'combinedRisk',
-    'Combined Risk Absolute Reversal',
-    'ssp245',
-    'cmbrs__',
-    'risk'
-  ),
-  supersectionEntry(
-    'ssp585',
-    'combinedRisk',
-    'Combined Risk Absolute Reversal',
-    'ssp585',
-    'cmbrs__',
-    'risk'
-  ),
+  // supersectionEntry(
+  //   'ssp245',
+  //   'combinedRisk',
+  //   'Combined Risk Absolute Reversal',
+  //   'ssp245',
+  //   'cmbrs__',
+  //   'risk'
+  // ),
+  // supersectionEntry(
+  //   'ssp585',
+  //   'combinedRisk',
+  //   'Combined Risk Absolute Reversal',
+  //   'ssp585',
+  //   'cmbrs__',
+  //   'risk'
+  // ),
 
   // ---------- US: Buffer Pool (per-driver, ssp245 only) ----------
   rasterEntry({
@@ -319,7 +319,7 @@ export interface SupersectionMetric {
 }
 
 export const SUPERSECTION_METRICS: readonly SupersectionMetric[] = [
-  { key: 'cmbrs__', label: 'Combined Risk Reversal' },
+  // { key: 'cmbrs__', label: 'Combined Risk Reversal' },
   { key: 'cmbsm__', label: 'Combined Sum' },
   { key: 'frtrs__', label: 'Fire Reversal' },
   { key: 'drtrs__', label: 'Drought Reversal' },
