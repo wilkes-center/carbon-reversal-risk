@@ -320,7 +320,6 @@ export interface SupersectionMetric {
 
 export const SUPERSECTION_METRICS: readonly SupersectionMetric[] = [
   // { key: 'cmbrs__', label: 'Combined Risk Reversal' },
-  { key: 'cmbsm__', label: 'Combined Sum' },
   { key: 'frtrs__', label: 'Fire Reversal' },
   { key: 'drtrs__', label: 'Drought Reversal' },
   { key: 'insrs__', label: 'Insect Reversal' },
