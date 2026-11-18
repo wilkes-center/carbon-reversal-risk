@@ -361,18 +361,6 @@ export const getColorScale = (id: string | null | undefined): ColorScale | null 
   return entry ? entry.colorScale : null;
 };
 
-export const hasGlobalLayers = (): boolean =>
-  LAYER_ENTRIES.some((entry) => entry.scope === 'global');
-
-const FALSY = new Set(['false', '0', 'no', 'off', '']);
-
-export const showGlobalLayers = (): boolean => {
-  if (!hasGlobalLayers()) return false;
-  const flag = process.env.NEXT_PUBLIC_HIDE_GLOBAL_LAYERS;
-  if (!flag) return true;
-  return FALSY.has(flag.trim().toLowerCase());
-};
-
 export const userFriendlyLayerName = (id: string | null | undefined): string => {
   const entry = getLayerEntry(id);
   if (!entry) return id ?? '';

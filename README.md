@@ -36,10 +36,6 @@ NEXT_PUBLIC_MAPBOX_TOKEN="pk.your-public-token"
 # Required ONLY by scripts/mapbox/ to upload tilesets.
 # Needs scopes: tilesets:write, tilesets:read, tilesets:list
 MAPBOX_SECRET_TOKEN="sk.your-secret-token"
-
-# Optional. Hide the "Global Layers" panel section even when global
-# tilesets are registered. Defaults to showing the section.
-NEXT_PUBLIC_HIDE_GLOBAL_LAYERS=true
 ```
 
 `.env*.local` is gitignored. Never commit `sk.…` secret tokens.

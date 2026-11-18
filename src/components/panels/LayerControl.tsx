@@ -2,8 +2,6 @@
 // components/controls/LayerControl.jsx
 import React, { useMemo, useState, useEffect } from 'react';
 import { useMapPaint } from '../../contexts/MapPaintContext';
-import { showGlobalLayers } from '../../config/mapboxLayers';
-
 import { SectionHeader, LoadingOverlay } from '../controls/PanelUIComponents';
 import { LayerGroup, ReferenceLayers, UploadSection, DrawControls } from '../controls/LayerSections';
 
@@ -39,7 +37,6 @@ const LayerControl = ({
   toggleCongressionalDistricts,
   setUploadStatus,
 }) => {
-  const globalEnabled = useMemo(() => showGlobalLayers(), []);
   const [expandedSections, setExpandedSections] = useState({
     global: true,
     us: true,
@@ -114,9 +111,7 @@ const LayerControl = ({
         <div className={`divide-y ${
           isDarkMode ? 'divide-gray-800' : 'divide-gray-100'
         }`}>
-          {/* Global Section (auto-hidden when there are no global layers
-              configured OR when NEXT_PUBLIC_HIDE_GLOBAL_LAYERS=true). */}
-          {globalEnabled && globalGroupKeys.length > 0 && (
+          {globalGroupKeys.length > 0 && (
             <section>
               <SectionHeader
                 title="Global Layers"

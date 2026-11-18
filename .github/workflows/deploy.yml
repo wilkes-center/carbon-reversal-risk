@@ -43,7 +43,6 @@ jobs:
       - name: Build
         env:
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_TOKEN }}
-          NEXT_PUBLIC_HIDE_GLOBAL_LAYERS: ${{ vars.NEXT_PUBLIC_HIDE_GLOBAL_LAYERS }}
         run: pnpm build
 
       - name: Disable Jekyll processing
