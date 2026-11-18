@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePaintProperty } from '../../utils/colors/colorScales';
-import { layers } from '../../utils/map/layers';
+import { layers, loadFullRasterTiles } from '../../utils/map/layers';
 import { logger } from '../../utils/logger';
 
 export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
@@ -37,6 +37,7 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
 
     cleanupLayer(activeLayer);
     const paint = generatePaintProperty(activeLayer, isDarkMode);
+    const isRaster = layerConfig.layer.type === 'raster';
 
     if (!map.getSource(activeLayer)) {
       map.addSource(activeLayer, layerConfig.source);
@@ -44,18 +45,25 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
 
     map.addLayer({
       id: activeLayer,
-      type: 'fill',
+      type: isRaster ? 'raster' : 'fill',
       source: activeLayer,
       'source-layer': layerConfig.layer['source-layer'],
-      paint: {
-        'fill-color': paint['fill-color'],
-        'fill-opacity': 0.7,
-        'fill-outline-color': 'rgba(0,0,0,0)',
-      },
+      paint: isRaster
+        ? paint
+        : {
+            'fill-color': paint['fill-color'],
+            'fill-opacity': 0.7,
+            'fill-outline-color': 'rgba(0,0,0,0)',
+          },
       layout: { visibility: 'visible' },
-      filter: layerConfig.layer.filter,
+      ...(isRaster ? {} : { filter: layerConfig.layer.filter }),
     });
+    if (isRaster) loadFullRasterTiles(map, activeLayer);
     setIsLoading(false);
+
+    const handleSourceData = (event) => {
+      if (isRaster && event.sourceId === activeLayer) loadFullRasterTiles(map, activeLayer);
+    };
 
     const handleStyleData = () => {
       if (!map.isStyleLoaded()) return;
@@ -68,9 +76,11 @@ export const useEnhancedMapLayer = (map, activeLayer, isDarkMode) => {
     };
 
     map.on('styledata', handleStyleData);
+    map.on('sourcedata', handleSourceData);
 
     cleanupRef.current[activeLayer] = () => {
       map.off('styledata', handleStyleData);
+      map.off('sourcedata', handleSourceData);
       cleanupLayer(activeLayer);
     };
 

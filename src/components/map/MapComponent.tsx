@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Source, Layer, Popup, ScaleControl, Map } from 'react-map-gl/mapbox';
 import mapboxgl from 'mapbox-gl';
-import { layers } from '../../utils/map/layers';
+import { layers, loadFullRasterTiles } from '../../utils/map/layers';
 import {
   LAYER_GROUPS,
   getValueProperty,
@@ -248,6 +248,10 @@ const MapComponent = () => {
     
     // Add a guard to prevent unnecessary updates
     if (!map.getLayer(layerId)) return;
+    if (map.getLayer(layerId).type === 'raster') {
+      debouncedLayerUpdate(map, layerId, generatePaintProperty(layerId, isDarkMode));
+      return;
+    }
     
     // Check if the custom colors were set in the current theme
     const storedTheme = customLegendColors[`${layerId}_theme`];
@@ -440,6 +444,7 @@ const handleMapClick = useCallback((event) => {
 
     try {
       if (!map.getLayer(layerId)) return;
+      if (map.getLayer(layerId).type === 'raster') return;
 
       const valueKey = getValueProperty(layerId);
       const defaultPaint = {
@@ -500,23 +505,27 @@ const handleMapClick = useCallback((event) => {
         if (!map.getSource(layerId)) {
           map.addSource(layerId, layerConfig.source);
         }
+        const isRaster = layerConfig.layer.type === 'raster';
 
         setTimeout(() => {
           const paint = generatePaintProperty(layerId, isDarkMode);
           map.addLayer({
             id: layerId,
-            type: 'fill',
+            type: isRaster ? 'raster' : 'fill',
             source: layerId,
             'source-layer': layerConfig.layer['source-layer'],
-            paint: {
-              'fill-color': paint['fill-color'],
-              'fill-opacity': 0.7,
-              'fill-outline-color': 'rgba(0,0,0,0)',
-              'fill-outline-opacity': 0,
-            },
+            paint: isRaster
+              ? paint
+              : {
+                  'fill-color': paint['fill-color'],
+                  'fill-opacity': 0.7,
+                  'fill-outline-color': 'rgba(0,0,0,0)',
+                  'fill-outline-opacity': 0,
+                },
             layout: { visibility: 'visible' },
-            filter: layerConfig.layer.filter,
+            ...(isRaster ? {} : { filter: layerConfig.layer.filter }),
           });
+          if (isRaster) loadFullRasterTiles(map, layerId);
           resolve();
         }, 100);
       });

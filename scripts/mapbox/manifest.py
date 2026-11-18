@@ -137,7 +137,7 @@ TILESETS: tuple[TilesetSpec, ...] = (
     # ------------------------------------------------------------- Global
     TilesetSpec(
         tileset_id="globalbufferpool_low_ssp245",
-        source=Path("globalBufferPolls_low_8km_ssp245_resetallAgeRevision.tif"),
+        source=Path("globalBufferPools_low_8km_ssp245_resetallAgeRevision.tif"),
         kind="raster",
         source_layer="globalbufferpool_low_ssp245",
         scope="global",
@@ -146,7 +146,7 @@ TILESETS: tuple[TilesetSpec, ...] = (
     TilesetSpec(
         tileset_id="globalbufferpool_moderate_ssp245",
         source=Path(
-            "globalBufferPolls_moderate_8km_ssp245_resetallAgeRevision.tif"
+            "globalBufferPools_moderate_8km_ssp245_resetallAgeRevision.tif"
         ),
         kind="raster",
         source_layer="globalbufferpool_moderate_ssp245",
@@ -155,7 +155,7 @@ TILESETS: tuple[TilesetSpec, ...] = (
     ),
     TilesetSpec(
         tileset_id="globalbufferpool_high_ssp245",
-        source=Path("globalBufferPolls_high_8km_ssp245_resetallAgeRevision.tif"),
+        source=Path("globalBufferPools_high_8km_ssp245_resetallAgeRevision.tif"),
         kind="raster",
         source_layer="globalbufferpool_high_ssp245",
         scope="global",
@@ -182,6 +182,30 @@ TILESETS: tuple[TilesetSpec, ...] = (
         source=Path("globalReversal_high_8km_ssp245_resetallAgeRevision.tif"),
         kind="raster",
         source_layer="globalreversal_high_ssp245",
+        scope="global",
+        maxzoom=8,
+    ),
+    TilesetSpec(
+        tileset_id="globalexpcloss_low_ssp245",
+        source=Path("globalExpCloss_low_8km_ssp245_resetallAgeRevision.tif"),
+        kind="raster",
+        source_layer="globalexpcloss_low_ssp245",
+        scope="global",
+        maxzoom=8,
+    ),
+    TilesetSpec(
+        tileset_id="globalexpcloss_moderate_ssp245",
+        source=Path("globalExpCloss_moderate_8km_ssp245_resetallAgeRevision.tif"),
+        kind="raster",
+        source_layer="globalexpcloss_moderate_ssp245",
+        scope="global",
+        maxzoom=8,
+    ),
+    TilesetSpec(
+        tileset_id="globalexpcloss_high_ssp245",
+        source=Path("globalExpCloss_high_8km_ssp245_resetallAgeRevision.tif"),
+        kind="raster",
+        source_layer="globalexpcloss_high_ssp245",
         scope="global",
         maxzoom=8,
     ),

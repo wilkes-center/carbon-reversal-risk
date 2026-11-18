@@ -47,8 +47,11 @@ const useLayerStyleManager = (map, activeLayer, isDarkMode, legendStateManager) 
       try {
         const savedLegendState = legendStateManager?.getLegendState(activeLayer);
         const valueKey = getValueProperty(layerId);
+        const isRaster = map.getLayer(layerId)?.type === 'raster';
 
-        const paint = savedLegendState
+        const paint = isRaster
+          ? generatePaintProperty(layerId, isDarkMode)
+          : savedLegendState
           ? {
               'fill-color': [
                 'interpolate',

@@ -7,6 +7,7 @@ import { Info, X } from 'lucide-react';
     const descriptions = {
       "Global Buffer Pool": "Provides the estimated buffer pool contribution (tCO2e/Ha) required to compensate for carbon losses in forests over 100 years, based on aggregated disturbance risks across three different disturbance severity scenarios.",
       "Global Reversal Probability": "Shows carbon reversal probability under a moderate-emissions scenario (SSP2-4.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
+      "Global Expected C Loss": "Shows the expected carbon loss in forests over 100 years under a moderate-emissions scenario (SSP2-4.5), for low, moderate, and high disturbance severity scenarios.",
       "Buffer Pool SSP245": "Provides the estimated buffer pool contribution (tCO2e/Ha) required to compensate for carbon losses in forests over 100 years, based on aggregated disturbance risks. Values correspond to the moderate-emissions climate scenario SSP245.",
       "Reversal Probability SSP245": "Shows carbon reversal probability under a moderate-emissions scenario (SSP2-4.5) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",
       "Reversal Probability SSP370": "Shows carbon reversal probability under a high-emissions scenario (SSP3-7.0) over 100 years, indicating areas with varying odds of a carbon loss due to climate disturbances, measured as a percentage (0-100).",

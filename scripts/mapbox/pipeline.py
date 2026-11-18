@@ -147,6 +147,35 @@ def convert(spec: TilesetSpec, source_path: Path) -> Path:
     return convert_shapefile(spec, source_path)
 
 
+def write_raster_recipe(spec: TilesetSpec) -> Path:
+    """Raster-array recipe. Global 8 km grids stay pixels instead of polygons."""
+    recipe = {
+        "version": 1,
+        "type": "rasterarray",
+        "sources": [
+            {
+                "uri": f"mapbox://tileset-source/{MAPBOX_USERNAME}/{spec.source_id}",
+            }
+        ],
+        "minzoom": spec.minzoom,
+        "maxzoom": 5,
+        "layers": {
+            spec.source_layer: {
+                "tilesize": 256,
+                "buffer": 1,
+                "resampling": "nearest",
+                "source_rules": {
+                    "filter": ["all", ["in", ["bandindex"], ["literal", [1]]]],
+                },
+            }
+        },
+    }
+    BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    path = BUILD_DIR / f"{spec.tileset_id}.recipe.json"
+    path.write_text(json.dumps(recipe, indent=2))
+    return path
+
+
 def write_recipe(spec: TilesetSpec) -> Path:
     recipe = {
         "version": 1,
@@ -168,11 +197,19 @@ def run_cli(*args: str) -> str:
     """Invoke the `tilesets` CLI and return stdout (raises on non-zero exit)."""
     result = subprocess.run(
         ["tilesets", *args],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
-    return result.stdout.strip()
+    if result.returncode != 0:
+        sys.stderr.write(result.stderr)
+        sys.stderr.write(result.stdout)
+        result.check_returncode()
+    output = result.stdout.strip()
+    if '"Recipe is invalid."' in output or '"message": "Recipe is invalid."' in output:
+        sys.stderr.write(output + "\n")
+        raise subprocess.CalledProcessError(1, ["tilesets", *args], output, result.stderr)
+    return output
 
 
 def tileset_exists(client: httpx.Client, full_id: str, token: str) -> bool:
@@ -180,11 +217,114 @@ def tileset_exists(client: httpx.Client, full_id: str, token: str) -> bool:
         f"https://api.mapbox.com/tilesets/v1/{full_id}?access_token={token}"
     )
     if r.status_code == 200:
-        return True
+        body = r.json()
+        return isinstance(body, dict) and "id" in body and "message" not in body
     if r.status_code == 404:
         return False
     r.raise_for_status()
     return False
+
+
+def upload_rasterarray(
+    spec: TilesetSpec,
+    source_path: Path,
+    client: httpx.Client,
+    token: str,
+) -> None:
+    """Publish a global GeoTIFF as a raster-array tileset."""
+    print(f"\n=== {spec.full_id} (raster-array) ===")
+    print(f"  source: {source_path}")
+    print(f"  uploading raster source -> {spec.source_id}")
+    run_cli(
+        "upload-raster-source",
+        "--replace",
+        MAPBOX_USERNAME,
+        spec.source_id,
+        str(source_path),
+    )
+
+    recipe = write_raster_recipe(spec)
+    run_cli("validate-recipe", str(recipe))
+
+    if tileset_exists(client, spec.full_id, token):
+        current = run_cli("view-recipe", spec.full_id)
+        payload: dict = {}
+        try:
+            payload = json.loads(current)
+        except json.JSONDecodeError:
+            payload = {}
+        recipe_doc = payload.get("recipe", payload)
+        if not isinstance(recipe_doc, dict):
+            recipe_doc = {}
+        print(f"  current recipe type: {recipe_doc.get('type')}")
+        if recipe_doc.get("type") == "rasterarray":
+            print(f"  updating recipe for {spec.full_id}")
+            try:
+                print(run_cli("update-recipe", spec.full_id, str(recipe)))
+            except subprocess.CalledProcessError:
+                print(f"  update failed, creating {spec.full_id}")
+                print(
+                    run_cli(
+                        "create",
+                        spec.full_id,
+                        "--recipe",
+                        str(recipe),
+                        "--name",
+                        spec.tileset_id,
+                    )
+                )
+        elif recipe_doc.get("type"):
+            print(f"  replacing {spec.full_id} with a raster-array tileset")
+            print(run_cli("delete", spec.full_id, "--force"))
+            time.sleep(2)
+            print(
+                run_cli(
+                    "create",
+                    spec.full_id,
+                    "--recipe",
+                    str(recipe),
+                    "--name",
+                    spec.tileset_id,
+                )
+            )
+        else:
+            print(f"  creating tileset {spec.full_id}")
+            print(
+                run_cli(
+                    "create",
+                    spec.full_id,
+                    "--recipe",
+                    str(recipe),
+                    "--name",
+                    spec.tileset_id,
+                )
+            )
+    else:
+        print(f"  creating tileset {spec.full_id}")
+        print(
+            run_cli(
+                "create",
+                spec.full_id,
+                "--recipe",
+                str(recipe),
+                "--name",
+                spec.tileset_id,
+            )
+        )
+
+    print(f"  publishing {spec.full_id}")
+    last_error: subprocess.CalledProcessError | None = None
+    for attempt in range(1, 4):
+        try:
+            job_output = run_cli("publish", spec.full_id)
+            print(f"  job: {job_output}")
+            return
+        except subprocess.CalledProcessError as exc:
+            last_error = exc
+            print(f"  publish attempt {attempt} failed, retrying")
+            time.sleep(20)
+    if last_error is not None:
+        raise last_error
 
 
 def upload_one(
@@ -195,6 +335,10 @@ def upload_one(
 ) -> None:
     print(f"\n=== {spec.full_id} ({spec.kind}) ===")
     print(f"  source: {source_path}")
+
+    if spec.scope == "global" and spec.kind == "raster":
+        upload_rasterarray(spec, source_path, client, token)
+        return
 
     ldjson = convert(spec, source_path)
     recipe = write_recipe(spec)
@@ -269,7 +413,11 @@ def main() -> None:
     with httpx.Client(timeout=60.0) as client:
         for spec in tqdm(selected, desc="tilesets", unit="tileset"):
             cached = _ldjson_path(spec)
-            if args.skip_convert and cached.exists():
+            if (
+                spec.scope != "global"
+                and args.skip_convert
+                and cached.exists()
+            ):
                 print(f"\n=== {spec.full_id} (reusing cached geojson) ===")
                 recipe = write_recipe(spec)
                 run_cli(

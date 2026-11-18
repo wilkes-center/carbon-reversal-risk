@@ -11,7 +11,7 @@
  */
 
 export type LayerScope = 'us' | 'global';
-export type ColorScale = 'buffer' | 'risk' | 'globalbp';
+export type ColorScale = 'buffer' | 'risk' | 'globalbp' | 'closs';
 
 export interface LayerEntry {
   /** Unique button id. */
@@ -259,6 +259,32 @@ export const LAYER_ENTRIES: LayerEntry[] = [
     variant: 'high',
     tileset: 'globalreversal_high_ssp245',
     colorScale: 'risk',
+  }),
+
+  // ---------- Global: Expected C Loss (low/moderate/high, ssp245 only) ----------
+  rasterEntry({
+    group: 'globalExpectedCLoss',
+    groupLabel: 'Global Expected C Loss',
+    scope: 'global',
+    variant: 'low',
+    tileset: 'globalexpcloss_low_ssp245',
+    colorScale: 'closs',
+  }),
+  rasterEntry({
+    group: 'globalExpectedCLoss',
+    groupLabel: 'Global Expected C Loss',
+    scope: 'global',
+    variant: 'moderate',
+    tileset: 'globalexpcloss_moderate_ssp245',
+    colorScale: 'closs',
+  }),
+  rasterEntry({
+    group: 'globalExpectedCLoss',
+    groupLabel: 'Global Expected C Loss',
+    scope: 'global',
+    variant: 'high',
+    tileset: 'globalexpcloss_high_ssp245',
+    colorScale: 'closs',
   }),
 ];
 

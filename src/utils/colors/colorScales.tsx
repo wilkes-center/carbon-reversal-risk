@@ -1,10 +1,11 @@
 import { logger } from '../logger';
-import { getColorScale, getValueProperty, type ColorScale } from '../../config/mapboxLayers';
+import { getColorScale, getLayerEntry, getValueProperty, type ColorScale } from '../../config/mapboxLayers';
 
 const SCALE_RANGES: Record<ColorScale, number[]> = {
   buffer: [0, 3, 5, 10, 20, 30, 60, 80, 100, 300],
   risk: [0, 10, 20, 30, 40, 50, 60, 80, 100],
   globalbp: [0, 15, 25, 50, 75, 100, 200, 300, 500, 800],
+  closs: [0, 5, 10, 15, 20, 30, 40, 50, 60, 80],
 };
 
 const LIGHT_COLORS: Record<ColorScale, string[]> = {
@@ -20,6 +21,10 @@ const LIGHT_COLORS: Record<ColorScale, string[]> = {
     '#ffffd4', '#fee391', '#fec44f', '#fe9929', '#ec7014',
     '#cc4c02', '#993404', '#662506', '#331303', '#000000',
   ],
+  closs: [
+    '#fff5f0', '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a',
+    '#ef3b2c', '#cb181d', '#a50f15', '#67000d', '#3b0008',
+  ],
 };
 
 const DARK_COLORS: Record<ColorScale, string[]> = {
@@ -32,6 +37,10 @@ const DARK_COLORS: Record<ColorScale, string[]> = {
     '#48cae4', '#90e0ef', '#ade8f4', '#caf0f8', '#e5f6f8',
   ],
   globalbp: [
+    '#023047', '#0466c8', '#0077b6', '#0096c7', '#00b4d8',
+    '#48cae4', '#90e0ef', '#ade8f4', '#caf0f8', '#e5f6f8',
+  ],
+  closs: [
     '#023047', '#0466c8', '#0077b6', '#0096c7', '#00b4d8',
     '#48cae4', '#90e0ef', '#ade8f4', '#caf0f8', '#e5f6f8',
   ],
@@ -63,6 +72,22 @@ export const generatePaintProperty = (
 
     const scale = buildScale(kind, isDarkMode);
     const valueKey = getValueProperty(layerId);
+    const entry = getLayerEntry(layerId);
+
+    if (entry?.scope === 'global') {
+      return {
+        'raster-opacity': 0.7,
+        'raster-resampling': 'nearest',
+        'raster-color-range': [scale[0].value, scale[scale.length - 1].value],
+        'raster-color-range-transition': { duration: 0, delay: 0 },
+        'raster-color': [
+          'interpolate',
+          ['linear'],
+          ['raster-value'],
+          ...scale.flatMap((stop) => [stop.value, stop.color]),
+        ],
+      };
+    }
 
     return {
       'fill-color': [
